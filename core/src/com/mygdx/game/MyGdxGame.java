@@ -39,6 +39,9 @@ public class MyGdxGame extends ApplicationAdapter {
         creatures.add(new Ghost(gameMap, 7, 7, PACMAN_SPEED * 1.3f, "green_ghost.png"));
         creatures.add(new Ghost(gameMap, 7, 7, PACMAN_SPEED * 1.4f, "red_ghost.png"));
         creatures.add(new Ghost(gameMap, 7, 7, PACMAN_SPEED * 1.4f, "red_ghost.png"));
+        creatures.add(new Ghost(gameMap, 7, 7, PACMAN_SPEED * 0.8f, "white_ghost.png"));
+        creatures.add(new Ghost(gameMap, 7, 7, PACMAN_SPEED * 0.8f, "white_ghost.png"));
+
         creatures.add(pacMan);
 
         camera = new OrthographicCamera();

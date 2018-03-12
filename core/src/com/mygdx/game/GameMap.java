@@ -8,11 +8,13 @@ public class GameMap {
     public static final int CELL_SIZE_PX = 80;
     public static final int SYMB_CELL_WALL = 9;
     public static final int SYMB_FOOD = 5;
+    public static final int SYMB_XFOOD = 6;
 
     private byte[][] mapData;
     private Texture textureGround;
     private Texture textureWall;
     private Texture textureFood;
+    private Texture textureXFood;
     private int foodCount;
 
     public int getFoodCount() {
@@ -24,6 +26,7 @@ public class GameMap {
         textureGround = new Texture("ground.png");
         textureWall = new Texture("wall.png");
         textureFood = new Texture("food.png");
+        textureXFood = new Texture("xfood.png");
         for (int i = 0; i < WORLD_CELLS_SIZE; i++) {
             mapData[i][0] = SYMB_CELL_WALL;
             mapData[0][i] = SYMB_CELL_WALL;
@@ -41,7 +44,9 @@ public class GameMap {
                 }
             }
         }
-        mapData[1][1] = -1;
+        mapData[1][1] = 0;
+        mapData[1][5] = 6;
+        mapData[5][1] = 6;
     }
 
     public void render(SpriteBatch batch) {
@@ -53,6 +58,9 @@ public class GameMap {
                 }
                 if (mapData[i][j] == SYMB_FOOD) {
                     batch.draw(textureFood, i * CELL_SIZE_PX, j * CELL_SIZE_PX);
+                }
+                if (mapData[i][j] == SYMB_XFOOD) {
+                    batch.draw(textureXFood, i * CELL_SIZE_PX, j * CELL_SIZE_PX);
                 }
             }
         }
