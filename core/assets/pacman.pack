@@ -1,0 +1,47 @@
+
+images1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+pacman
+  rotate: false
+  xy: 2, 2
+  size: 480, 80
+  orig: 480, 80
+  offset: 0, 0
+  index: -1
+ghosts
+  rotate: false
+  xy: 2, 84
+  size: 160, 400
+  orig: 160, 400
+  offset: 0, 0
+  index: -1
+xfood
+  rotate: false
+  xy: 164, 84
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+wall
+  rotate: false
+  xy: 246, 84
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+ground
+  rotate: false
+  xy: 328, 84
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+food
+  rotate: false
+  xy: 410, 84
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
