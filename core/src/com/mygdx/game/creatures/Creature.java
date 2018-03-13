@@ -23,25 +23,34 @@ public abstract class Creature {
     protected float animationTimer;
     protected float secPerFrame;
     protected int rotation;
+    protected int mapX;
+    protected int mapY;
     protected final int startX;
     protected final int startY;
 
     public Creature(GameMap gameMap, int posX, int posY, float baseSpeed) {
         this.startX = posX;
         this.startY = posY;
+        this.mapX = posX;
+        this.mapY = posY;
         this.gameMap = gameMap;
         this.baseSpeed = baseSpeed;
         this.currentSpeed = baseSpeed;
-
+        this.position = new Vector2(startX * SIZE, startY * SIZE);
+        this.destination = new Vector2(startX * SIZE, startY * SIZE);
+        this.velocity = new Vector2(0,0);
+        this.direction = new Vector2(0,0);
         this.animationTimer = 0.0f;
         this.secPerFrame = 0.1f;
     }
 
-    public void init() {
-        position = new Vector2(startX * SIZE, startY * SIZE);
-        velocity = new Vector2(0, 0);
-        direction = new Vector2(0, 0);
-        destination = position.cpy();
+    public void initPosition() {
+        position.set(startX * SIZE, startY * SIZE);
+        destination.set(position);
+        velocity.set(0, 0);
+        direction.set(0, 0);
+        mapX = startX;
+        mapY = startY;
         action = Action.IDLE;
         rotation = 0;
     }
@@ -52,6 +61,14 @@ public abstract class Creature {
 
     public float getCY() {
         return position.y + HALF_SIZE;
+    }
+
+    public int getMapX() {
+        return mapX;
+    }
+
+    public int getMapY() {
+        return mapY;
     }
 
     public Vector2 getPosition() {
@@ -93,6 +110,8 @@ public abstract class Creature {
             if (position.dst(destination) > oldDistance)  {
                 position.x = destination.x;
                 position.y = destination.y;
+                mapX = (int)position.x / SIZE;
+                mapY = (int)position.y / SIZE;
                 action = Action.IDLE;
             }
         }

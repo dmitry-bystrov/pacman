@@ -4,8 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameMap;
 import com.mygdx.game.screens.GameScreen;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class Ghost extends Creature {
     public enum GhostType {
@@ -27,20 +32,29 @@ public class Ghost extends Creature {
         }
     }
 
+    public enum WhoIsKilled { PACMAN, GHOST, NOBODY }
+
     private GhostType currentGhostType;
     private GhostType originalGhostType;
     private TextureRegion[] originalTextureRegions;
     private TextureRegion[] eatableTextureRegions;
-    private Pacman pacman;
+    private Vector2 targetPosition;
+    private boolean chaseMode;
 
-    public Ghost(GameMap gameMap, Pacman pacman, int posX, int posY, float baseSpeed, TextureAtlas atlas, GhostType ghostType) {
+    public Ghost(GameMap gameMap, int posX, int posY, float baseSpeed, TextureAtlas atlas, GhostType ghostType) {
         super(gameMap, posX, posY, baseSpeed);
-        this.pacman = pacman;
         this.originalTextureRegions = atlas.findRegion("ghosts").split(SIZE, SIZE)[ghostType.getTextureRegionNumber()];
         this.eatableTextureRegions = atlas.findRegion("ghosts").split(SIZE, SIZE)[GhostType.EATABLE.getTextureRegionNumber()];
         this.originalGhostType = ghostType;
+        this.chaseMode = false;
+        targetPosition = new Vector2(startX * SIZE, startY * SIZE);
         setEatable(false);
         secPerFrame = 0.3f;
+    }
+
+    public void setTargetPosition(int x, int y) {
+        targetPosition.set(x * SIZE, y * SIZE);
+        chaseMode = true;
     }
 
     public void setEatable(boolean eatable) {
@@ -54,30 +68,48 @@ public class Ghost extends Creature {
         currentSpeed = baseSpeed * currentGhostType.getSpeed();
     }
 
-    @Override
-    public void update(float dt) {
-        if (pacman.getPosition().dst(position) < HALF_SIZE) {
+    public WhoIsKilled checkContact(Vector2 pacmanPosition) {
+        if (pacmanPosition.dst(position) < HALF_SIZE) {
             if (currentGhostType == GhostType.EATABLE) {
-                System.out.println("Ghost is killed!");
-                init();
+                return WhoIsKilled.GHOST;
             } else {
-                System.out.println("Pacman is killed!");
-                pacman.decreaseLives();
-                if (pacman.getLives() == 0) {
-                    System.out.println("Game over!");
-                    Gdx.app.exit();
-                } else {
-                    pacman.init();
-                }
+                return WhoIsKilled.PACMAN;
             }
         }
-        super.update(dt);
+        return WhoIsKilled.NOBODY;
     }
 
     @Override
     protected void getDirection() {
         direction.x = 0;
         direction.y = 0;
+
+        if (chaseMode && currentGhostType != GhostType.EATABLE) {
+            if (targetPosition.dst(position) > 0) {
+                int[] xDirections = {0,  0, -1, 1};
+                int[] yDirections = {1, -1,  0, 0};
+                float[] distance = new float[4];
+                int minDistance = -1;
+                for (int i = 0; i < 4; i++) {
+                    if (gameMap.isCellEmpty(mapX + xDirections[i],mapY + yDirections[i])) {
+                        distance[i] = targetPosition.dst(destination.x + xDirections[i] * SIZE,
+                                destination.y + yDirections[i] * SIZE);
+                        if (minDistance == -1) {
+                            minDistance = i;
+                        } else {
+                            if (distance[i] < distance[minDistance]) minDistance = i;
+                        }
+                    }
+                }
+                if (minDistance != -1) {
+                    direction.x = xDirections[minDistance];
+                    direction.y = yDirections[minDistance];
+                    return;
+                }
+            } else {
+                chaseMode = false;
+            }
+        }
 
         int randomDirection = MathUtils.random(3);
 
@@ -100,8 +132,7 @@ public class Ghost extends Creature {
     }
 
     private void updateDirection(int x, int y) {
-        if (gameMap.isCellEmpty((int)destination.x / GameScreen.WORLD_CELL_PX + x,
-                (int)destination.y / GameScreen.WORLD_CELL_PX + y)) {
+        if (gameMap.isCellEmpty(mapX + x,mapY + y)) {
             direction.x = x;
             direction.y = y;
         }

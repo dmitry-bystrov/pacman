@@ -22,7 +22,7 @@ public class Pacman extends Creature {
 
     public boolean checkFoodEating() {
         if (action == Action.IDLE) {
-            return gameMap.checkFoodEating((int)position.x / SIZE, (int)position.y / SIZE);
+            return gameMap.checkFoodEating(mapX, mapY);
         }
         return false;
     }
@@ -55,8 +55,7 @@ public class Pacman extends Creature {
     }
 
     private void updateDirection(int x, int y) {
-        if (gameMap.isCellEmpty((int)destination.x / SIZE + x,
-                (int)destination.y / SIZE + y)) {
+        if (gameMap.isCellEmpty(mapX + x,mapY + y)) {
             direction.x = x;
             direction.y = y;
         }

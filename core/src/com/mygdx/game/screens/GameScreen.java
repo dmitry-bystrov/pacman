@@ -17,17 +17,17 @@ import java.util.ArrayList;
 
 public class GameScreen implements Screen {
     public static final int WORLD_CELL_PX = 80;
-    public static final float PACMAN_SPEED = 160;
+    public static final float BASE_SPEED = 160;
     public static final int EATABLE_GHOSTS_TIMER = 5;
+    public static final int PACMAN_ATTACK_TIMER = 5;
 
     private SpriteBatch batch;
     private Camera camera;
-    private Viewport viewport;
     private GameMap gameMap;
     private Pacman pacMan;
     private ArrayList<Ghost> ghosts;
-    private TextureAtlas atlas;
     private float eatableGhostsTimer;
+    private float packmanAttackTimer;
 
     public GameScreen(SpriteBatch batch) {
         this.batch = batch;
@@ -35,54 +35,43 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        atlas = new TextureAtlas(Gdx.files.internal("pacman.pack"));
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("pacman.pack"));
         gameMap = new GameMap(atlas);
         ghosts = new ArrayList<>();
-        pacMan = new Pacman(gameMap, 1, 1, PACMAN_SPEED, atlas);
-        ghosts.add(new Ghost(gameMap, pacMan, 7, 7, PACMAN_SPEED, atlas, Ghost.GhostType.RED));
-        ghosts.add(new Ghost(gameMap, pacMan, 7, 7, PACMAN_SPEED, atlas, Ghost.GhostType.RED));
-        ghosts.add(new Ghost(gameMap, pacMan, 7, 7, PACMAN_SPEED, atlas, Ghost.GhostType.GREEN));
-        ghosts.add(new Ghost(gameMap, pacMan, 7, 7, PACMAN_SPEED, atlas, Ghost.GhostType.GREEN));
-        ghosts.add(new Ghost(gameMap, pacMan, 7, 7, PACMAN_SPEED, atlas, Ghost.GhostType.BLUE));
-        ghosts.add(new Ghost(gameMap, pacMan, 7, 7, PACMAN_SPEED, atlas, Ghost.GhostType.BLUE));
-        ghosts.add(new Ghost(gameMap, pacMan, 7, 7, PACMAN_SPEED, atlas, Ghost.GhostType.PURPLE));
-        ghosts.add(new Ghost(gameMap, pacMan, 7, 7, PACMAN_SPEED, atlas, Ghost.GhostType.PURPLE));
+        pacMan = new Pacman(gameMap, 8, 8, BASE_SPEED, atlas);
+        ghosts.add(new Ghost(gameMap, 1, 1, BASE_SPEED, atlas, Ghost.GhostType.RED));
+        ghosts.add(new Ghost(gameMap, 1, 15, BASE_SPEED, atlas, Ghost.GhostType.GREEN));
+        ghosts.add(new Ghost(gameMap, 15, 1, BASE_SPEED, atlas, Ghost.GhostType.BLUE));
+        ghosts.add(new Ghost(gameMap, 15, 15, BASE_SPEED, atlas, Ghost.GhostType.PURPLE));
 
         camera = new OrthographicCamera();
-        viewport = new FitViewport(ScreenManager.VIEWPORT_WIDTH, ScreenManager.VIEWPORT_HEIGHT, camera);
+        Viewport viewport = new FitViewport(ScreenManager.VIEWPORT_WIDTH, ScreenManager.VIEWPORT_HEIGHT, camera);
         viewport.apply();
 
-        startNewGame();
+        initGameLevel();
     }
 
-    public void startNewGame() {
+    private void initGameLevel() {
         eatableGhostsTimer = 0;
-        gameMap.init();
-        pacMan.init();
+        packmanAttackTimer = 0;
+        gameMap.initMap();
+        pacMan.initPosition();
         for (int i = 0; i < ghosts.size(); i++) {
             ghosts.get(i).setEatable(false);
-            ghosts.get(i).init();
+            ghosts.get(i).initPosition();
+            ghosts.get(i).setTargetPosition(8,8);
         }
     }
 
-    @Override
-    public void render(float delta) {
+    private void update(float dt) {
 
-        update(delta);
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        gameMap.render(batch);
-        pacMan.render(batch);
-        for (int i = 0; i < ghosts.size(); i++) {
-            ghosts.get(i).render(batch);
+        packmanAttackTimer += dt;
+        if (packmanAttackTimer >= PACMAN_ATTACK_TIMER) {
+            for (int i = 0; i < ghosts.size(); i++) {
+                ghosts.get(i).setTargetPosition(pacMan.getMapX(), pacMan.getMapY());
+            }
+            packmanAttackTimer = 0;
         }
-        batch.end();
-    }
-
-    public void update(float dt) {
 
         if (eatableGhostsTimer > 0) {
             eatableGhostsTimer -= dt;
@@ -102,13 +91,29 @@ public class GameScreen implements Screen {
 
         if (gameMap.getFoodCount() == 0) {
             System.out.println("Pacman WIN!");
-            startNewGame();
+            initGameLevel();
         }
 
-        pacMan.update(dt);
         for (int i = 0; i < ghosts.size(); i++) {
+            switch (ghosts.get(i).checkContact(pacMan.getPosition())) {
+                case GHOST:
+                    System.out.println("Ghost is killed!");
+                    ghosts.get(i).initPosition();
+                    break;
+                case PACMAN:
+                    System.out.println("Packman is killed!");
+                    pacMan.decreaseLives();
+                    if (pacMan.getLives() == 0) {
+                        System.out.println("Game over!");
+                        ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
+                    } else {
+                        pacMan.initPosition();
+                    }
+            }
+
             ghosts.get(i).update(dt);
         }
+        pacMan.update(dt);
 
         camera.position.set(pacMan.getCX(), pacMan.getCY(), 0);
         if (camera.position.x < ScreenManager.VIEWPORT_WIDTH / 2) {
@@ -128,6 +133,22 @@ public class GameScreen implements Screen {
         if (Gdx.input.justTouched() && Gdx.input.getY() < 50) {
             ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
         }
+    }
+
+    @Override
+    public void render(float delta) {
+        update(delta);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.setProjectionMatrix(camera.combined);
+
+        batch.begin();
+        gameMap.render(batch);
+        pacMan.render(batch);
+        for (int i = 0; i < ghosts.size(); i++) {
+            ghosts.get(i).render(batch);
+        }
+        batch.end();
     }
 
     @Override

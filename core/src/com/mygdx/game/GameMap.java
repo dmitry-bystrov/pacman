@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.screens.GameScreen;
 
 public class GameMap {
-    public static final int WORLD_CELLS_SIZE = 9;
+    public static final int WORLD_CELLS_SIZE = 17;
     private static final int SYMB_CELL_WALL = 9;
     private static final int SYMB_FOOD = 5;
     private static final int SYMB_XFOOD = 6;
@@ -31,7 +31,7 @@ public class GameMap {
         textureXFood = atlas.findRegion("xfood");
     }
 
-    public void init() {
+    public void initMap() {
         foodCount = 0;
 
         for (int i = 0; i < WORLD_CELLS_SIZE; i++) {
@@ -52,10 +52,11 @@ public class GameMap {
             }
         }
 
-        mapData[1][1] = 0;
-        foodCount--;
-        mapData[1][5] = 6;
-        mapData[5][1] = 6;
+        mapData[8][8] = 0;
+        mapData[1][1] = SYMB_XFOOD;
+        mapData[1][15] = SYMB_XFOOD;
+        mapData[15][1] = SYMB_XFOOD;
+        mapData[15][15] = SYMB_XFOOD;
     }
 
     public void render(SpriteBatch batch) {
