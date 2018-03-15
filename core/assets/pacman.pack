@@ -3,18 +3,25 @@ images1.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-pacman
+ghosts
   rotate: false
   xy: 2, 2
+  size: 160, 400
+  orig: 160, 400
+  offset: 0, 0
+  index: -1
+pacman
+  rotate: false
+  xy: 2, 404
   size: 480, 80
   orig: 480, 80
   offset: 0, 0
   index: -1
-ghosts
+simpleButton
   rotate: false
-  xy: 2, 84
-  size: 160, 400
-  orig: 160, 400
+  xy: 164, 2
+  size: 320, 80
+  orig: 320, 80
   offset: 0, 0
   index: -1
 xfood
@@ -26,21 +33,28 @@ xfood
   index: -1
 wall
   rotate: false
-  xy: 246, 84
+  xy: 164, 166
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+shortButton
+  rotate: false
+  xy: 164, 248
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 ground
   rotate: false
-  xy: 328, 84
+  xy: 246, 84
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 food
   rotate: false
-  xy: 410, 84
+  xy: 328, 84
   size: 80, 80
   orig: 80, 80
   offset: 0, 0

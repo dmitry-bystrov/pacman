@@ -2,17 +2,18 @@ package com.mygdx.game.creatures;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.mygdx.game.Assets;
 import com.mygdx.game.GameMap;
 import com.mygdx.game.screens.GameScreen;
 
 public class Pacman extends Creature {
     public static final int MAX_LIVES = 3;
     private int lives;
+    private int score;
 
-    public Pacman(GameMap gameMap, int posX, int posY, float baseSpeed, TextureAtlas atlas) {
-        super(gameMap, posX, posY, baseSpeed);
-        this.textureRegions = atlas.findRegion("pacman").split(SIZE, SIZE)[0];
+    public Pacman(GameMap gameMap) {
+        super(gameMap, GameScreen.BASE_SPEED, GameMap.MapObject.PACMAN);
+        this.textureRegions = Assets.getInstance().getAtlas().findRegion("pacman").split(SIZE, SIZE)[0];
         lives = MAX_LIVES;
     }
 
@@ -20,9 +21,13 @@ public class Pacman extends Creature {
         return lives;
     }
 
+    public int getScore() {
+        return score;
+    }
+
     public boolean checkFoodEating() {
-        if (action == Action.IDLE) {
-            return gameMap.checkFoodEating(mapX, mapY);
+        if (action == Action.WAITING) {
+            return gameMap.checkFood((int)currentMapPosition.x, (int)currentMapPosition.y) == GameMap.MapObject.XFOOD;
         }
         return false;
     }
@@ -55,7 +60,7 @@ public class Pacman extends Creature {
     }
 
     private void updateDirection(int x, int y) {
-        if (gameMap.isCellEmpty(mapX + x,mapY + y)) {
+        if (gameMap.isCellEmpty((int)currentMapPosition.x + x,(int)currentMapPosition.y + y)) {
             direction.x = x;
             direction.y = y;
         }

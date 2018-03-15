@@ -1,92 +1,150 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.screens.GameScreen;
 
-public class GameMap {
-    public static final int WORLD_CELLS_SIZE = 17;
-    private static final int SYMB_CELL_WALL = 9;
-    private static final int SYMB_FOOD = 5;
-    private static final int SYMB_XFOOD = 6;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-    private byte[][] mapData;
+public class GameMap {
+
+    public enum MapObject {
+        PACMAN('s', true),
+        RED_GHOST('r', true),
+        GREEN_GHOST('g', true),
+        BLUE_GHOST('b', true),
+        PURPLE_GHOST('p', true),
+        WALL('1', false),
+        FOOD('_', false),
+        XFOOD('*', false),
+        EMPTY('0', false);
+
+        private final char symbol;
+        private final boolean isCreature;
+
+        MapObject(char symbol, boolean isCreature) {
+            this.symbol = symbol;
+            this.isCreature = isCreature;
+        }
+
+        public static MapObject getObject(char symbol) {
+            for (MapObject o:MapObject.values()) {
+                if (o.getSymbol() == symbol) return o;
+            }
+            return MapObject.EMPTY;
+        }
+
+        public boolean isCreature() {
+            return isCreature;
+        }
+
+        public char getSymbol() {
+            return symbol;
+        }
+    }
+
+    private MapObject[][] mapData;
     private TextureRegion textureGround;
     private TextureRegion textureWall;
     private TextureRegion textureFood;
     private TextureRegion textureXFood;
+    private int mapWidht;
+    private int mapHeight;
     private int foodCount;
+    private HashMap<MapObject, Vector2> startPositions;
+
+    public GameMap() {
+        textureGround = Assets.getInstance().getAtlas().findRegion("ground");
+        textureWall = Assets.getInstance().getAtlas().findRegion("wall");
+        textureFood = Assets.getInstance().getAtlas().findRegion("food");
+        textureXFood = Assets.getInstance().getAtlas().findRegion("xfood");
+        initMap();
+    }
 
     public int getFoodCount() {
         return foodCount;
     }
 
-    public GameMap(TextureAtlas atlas) {
-        mapData = new byte[WORLD_CELLS_SIZE][WORLD_CELLS_SIZE];
-        textureGround = atlas.findRegion("ground");
-        textureWall = atlas.findRegion("wall");
-        textureFood = atlas.findRegion("food");
-        textureXFood = atlas.findRegion("xfood");
+    public int getMapWidht() {
+        return mapWidht;
+    }
+
+    public int getMapHeight() {
+        return mapHeight;
+    }
+
+    public Vector2 getStartPosition(MapObject mapObject) {
+        return startPositions.get(mapObject);
     }
 
     public void initMap() {
-        foodCount = 0;
+        loadMap("map.dat");
+    }
 
-        for (int i = 0; i < WORLD_CELLS_SIZE; i++) {
-            mapData[i][0] = SYMB_CELL_WALL;
-            mapData[0][i] = SYMB_CELL_WALL;
-            mapData[i][WORLD_CELLS_SIZE - 1] = SYMB_CELL_WALL;
-            mapData[WORLD_CELLS_SIZE - 1][i] = SYMB_CELL_WALL;
+    private void loadMap(String name) {
+        startPositions = new HashMap<>();
+        ArrayList<String> list = new ArrayList<>();
+        BufferedReader br;
+        try {
+            br = Gdx.files.internal(name).reader(8192);
+            String str;
+            while ((str = br.readLine()) != null) {
+                list.add(str);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        for (int i = 0; i < WORLD_CELLS_SIZE; i++) {
-            for (int j = 0; j < WORLD_CELLS_SIZE; j++) {
-                if (i % 2 == 0 && j % 2 == 0) {
-                    mapData[i][j] = SYMB_CELL_WALL;
-                }
-                if (mapData[i][j] != SYMB_CELL_WALL) {
-                    mapData[i][j] = SYMB_FOOD;
-                    foodCount++;
+        mapWidht = list.get(0).length();
+        mapHeight = list.size();
+        mapData = new MapObject[mapWidht][mapHeight];
+        for (int y = 0; y < list.size(); y++) {
+            for (int x = 0; x < list.get(y).length(); x++) {
+                mapData[x][y] = MapObject.getObject(list.get(y).charAt(x));
+                if (mapData[x][y].isCreature()) {
+                    startPositions.put(mapData[x][y], new Vector2(x, y));
+                    mapData[x][y] = MapObject.EMPTY;
                 }
             }
         }
-
-        mapData[8][8] = 0;
-        mapData[1][1] = SYMB_XFOOD;
-        mapData[1][15] = SYMB_XFOOD;
-        mapData[15][1] = SYMB_XFOOD;
-        mapData[15][15] = SYMB_XFOOD;
     }
 
     public void render(SpriteBatch batch) {
-        for (int i = 0; i < WORLD_CELLS_SIZE; i++) {
-            for (int j = 0; j < WORLD_CELLS_SIZE; j++) {
+        for (int i = 0; i < mapWidht; i++) {
+            for (int j = 0; j < mapHeight; j++) {
                 batch.draw(textureGround, i * GameScreen.WORLD_CELL_PX, j * GameScreen.WORLD_CELL_PX);
-                if (mapData[i][j] == SYMB_CELL_WALL) {
-                    batch.draw(textureWall, i * GameScreen.WORLD_CELL_PX, j * GameScreen.WORLD_CELL_PX);
-                }
-                if (mapData[i][j] == SYMB_FOOD) {
-                    batch.draw(textureFood, i * GameScreen.WORLD_CELL_PX, j * GameScreen.WORLD_CELL_PX);
-                }
-                if (mapData[i][j] == SYMB_XFOOD) {
-                    batch.draw(textureXFood, i * GameScreen.WORLD_CELL_PX, j * GameScreen.WORLD_CELL_PX);
+                switch (mapData[i][j]) {
+                    case WALL:
+                        batch.draw(textureWall, i * GameScreen.WORLD_CELL_PX, j * GameScreen.WORLD_CELL_PX);
+                        break;
+                    case FOOD:
+                        batch.draw(textureFood, i * GameScreen.WORLD_CELL_PX, j * GameScreen.WORLD_CELL_PX);
+                        break;
+                    case XFOOD:
+                        batch.draw(textureXFood, i * GameScreen.WORLD_CELL_PX, j * GameScreen.WORLD_CELL_PX);
+                        break;
                 }
             }
         }
     }
 
     public boolean isCellEmpty(int cellX, int cellY) {
-        return mapData[cellX][cellY] != SYMB_CELL_WALL;
+        return mapData[cellX][cellY] != MapObject.WALL;
     }
 
-    public boolean checkFoodEating(int x, int y) {
-        boolean xfood = mapData[x][y] == SYMB_XFOOD;
-        if (mapData[x][y] == SYMB_FOOD || xfood) {
-            mapData[x][y] = 0;
+    public MapObject checkFood(int x, int y) {
+        MapObject mapObject = mapData[x][y];
+        if (mapObject == MapObject.FOOD || mapObject == MapObject.XFOOD) {
+            mapData[x][y] = MapObject.EMPTY;
             foodCount--;
         }
-
-        return xfood;
+        return mapObject;
     }
 }

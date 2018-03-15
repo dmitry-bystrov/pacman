@@ -7,13 +7,15 @@ import com.mygdx.game.GameMap;
 import com.mygdx.game.screens.GameScreen;
 
 public abstract class Creature {
-    protected enum Action { IDLE, MOVING, DIEING }
-    protected final int SIZE = GameScreen.WORLD_CELL_PX;
-    protected final int HALF_SIZE = GameScreen.WORLD_CELL_PX / 2;
+    protected enum Action {WAITING, MOVING, DIEING }
+    public final int SIZE = GameScreen.WORLD_CELL_PX;
+    public final int HALF_SIZE = GameScreen.WORLD_CELL_PX / 2;
 
     protected GameMap gameMap;
+    protected GameMap.MapObject mapObject; 
     protected TextureRegion[] textureRegions;
-    protected Vector2 position;
+    protected Vector2 currentWorldPosition;
+    protected Vector2 currentMapPosition;
     protected Vector2 direction;
     protected Vector2 destination;
     protected Vector2 velocity;
@@ -23,56 +25,37 @@ public abstract class Creature {
     protected float animationTimer;
     protected float secPerFrame;
     protected int rotation;
-    protected int mapX;
-    protected int mapY;
-    protected final int startX;
-    protected final int startY;
 
-    public Creature(GameMap gameMap, int posX, int posY, float baseSpeed) {
-        this.startX = posX;
-        this.startY = posY;
-        this.mapX = posX;
-        this.mapY = posY;
+    public Creature(GameMap gameMap, float baseSpeed, GameMap.MapObject mapObject) {
         this.gameMap = gameMap;
+        this.mapObject = mapObject;
         this.baseSpeed = baseSpeed;
         this.currentSpeed = baseSpeed;
-        this.position = new Vector2(startX * SIZE, startY * SIZE);
-        this.destination = new Vector2(startX * SIZE, startY * SIZE);
-        this.velocity = new Vector2(0,0);
-        this.direction = new Vector2(0,0);
+        this.currentWorldPosition = new Vector2();
+        this.currentMapPosition = new Vector2();
+        this.destination = new Vector2();
+        this.velocity = new Vector2();
+        this.direction = new Vector2();
         this.animationTimer = 0.0f;
-        this.secPerFrame = 0.1f;
+        this.secPerFrame = 0.08f;
     }
 
     public void initPosition() {
-        position.set(startX * SIZE, startY * SIZE);
-        destination.set(position);
+        currentMapPosition.set(gameMap.getStartPosition(mapObject));
+        currentWorldPosition.set(currentMapPosition).scl(SIZE);
+        destination.set(currentWorldPosition);
         velocity.set(0, 0);
         direction.set(0, 0);
-        mapX = startX;
-        mapY = startY;
-        action = Action.IDLE;
+        action = Action.WAITING;
         rotation = 0;
     }
 
-    public float getCX() {
-        return position.x + HALF_SIZE;
+    public Vector2 getCurrentMapPosition() {
+        return currentMapPosition;
     }
 
-    public float getCY() {
-        return position.y + HALF_SIZE;
-    }
-
-    public int getMapX() {
-        return mapX;
-    }
-
-    public int getMapY() {
-        return mapY;
-    }
-
-    public Vector2 getPosition() {
-        return position;
+    public Vector2 getCurrentWorldPosition() {
+        return currentWorldPosition;
     }
 
     public int getCurrentFrame() {
@@ -83,7 +66,7 @@ public abstract class Creature {
         if ((rotation == 180) != textureRegions[getCurrentFrame()].isFlipY()) {
             textureRegions[getCurrentFrame()].flip(false, true);
         }
-        batch.draw(textureRegions[getCurrentFrame()], position.x, position.y, HALF_SIZE, HALF_SIZE, SIZE, SIZE, 1, 1, rotation);
+        batch.draw(textureRegions[getCurrentFrame()], currentWorldPosition.x, currentWorldPosition.y, HALF_SIZE, HALF_SIZE, SIZE, SIZE, 1, 1, rotation);
     }
 
     public void update(float dt) {
@@ -92,7 +75,7 @@ public abstract class Creature {
             animationTimer = 0.0f;
         }
 
-        if (action == Action.IDLE)
+        if (action == Action.WAITING)
         {
             getDirection();
             if (direction.len() != 0) {
@@ -105,20 +88,20 @@ public abstract class Creature {
         }
 
         if (action == Action.MOVING) {
-            float oldDistance = position.dst(destination);
-            position.mulAdd(velocity, dt);
-            if (position.dst(destination) > oldDistance)  {
-                position.x = destination.x;
-                position.y = destination.y;
-                mapX = (int)position.x / SIZE;
-                mapY = (int)position.y / SIZE;
-                action = Action.IDLE;
+            float oldDistance = currentWorldPosition.dst(destination);
+            currentWorldPosition.mulAdd(velocity, dt);
+            if (currentWorldPosition.dst(destination) > oldDistance)  {
+                currentWorldPosition.x = destination.x;
+                currentWorldPosition.y = destination.y;
+                currentMapPosition.x = (int) currentWorldPosition.x / SIZE;
+                currentMapPosition.y = (int) currentWorldPosition.y / SIZE;
+                action = Action.WAITING;
             }
         }
     }
 
     private void updateVelocity() {
-        velocity.set(destination).sub(position).nor().scl(baseSpeed);
+        velocity.set(destination).sub(currentWorldPosition).nor().scl(baseSpeed);
     }
 
     protected abstract void getDirection();
