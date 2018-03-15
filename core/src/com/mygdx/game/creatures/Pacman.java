@@ -7,13 +7,11 @@ import com.mygdx.game.GameMap;
 import com.mygdx.game.screens.GameScreen;
 
 public class Pacman extends Creature {
-    public static final int MAX_LIVES = 3;
     private int lives;
     private int score;
 
     public Pacman(GameMap gameMap) {
-        super(gameMap, GameScreen.BASE_SPEED, GameMap.MapObject.PACMAN);
-        this.textureRegions = Assets.getInstance().getAtlas().findRegion("pacman").split(SIZE, SIZE)[0];
+        super(gameMap, GameObject.PACMAN);
         lives = MAX_LIVES;
     }
 
@@ -27,7 +25,11 @@ public class Pacman extends Creature {
 
     public boolean checkFoodEating() {
         if (action == Action.WAITING) {
-            return gameMap.checkFood((int)currentMapPosition.x, (int)currentMapPosition.y) == GameMap.MapObject.XFOOD;
+            GameObject uncknownObject = gameMap.checkFood((int)currentMapPosition.x, (int)currentMapPosition.y);
+            if (uncknownObject.isFood()) {
+                score += uncknownObject.getScore();
+                return uncknownObject == GameObject.XFOOD;
+            }
         }
         return false;
     }

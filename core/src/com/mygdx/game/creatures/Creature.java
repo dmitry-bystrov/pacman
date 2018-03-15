@@ -3,16 +3,18 @@ package com.mygdx.game.creatures;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.Assets;
+import com.mygdx.game.GameConstants;
 import com.mygdx.game.GameMap;
 import com.mygdx.game.screens.GameScreen;
 
-public abstract class Creature {
-    protected enum Action {WAITING, MOVING, DIEING }
-    public final int SIZE = GameScreen.WORLD_CELL_PX;
-    public final int HALF_SIZE = GameScreen.WORLD_CELL_PX / 2;
+public abstract class Creature implements GameConstants {
+
+    public final int SIZE = WORLD_CELL_PX;
+    public final int HALF_SIZE = WORLD_CELL_PX / 2;
 
     protected GameMap gameMap;
-    protected GameMap.MapObject mapObject; 
+    protected GameObject gameObject;
     protected TextureRegion[] textureRegions;
     protected Vector2 currentWorldPosition;
     protected Vector2 currentMapPosition;
@@ -20,17 +22,15 @@ public abstract class Creature {
     protected Vector2 destination;
     protected Vector2 velocity;
     protected Action action;
-    protected float baseSpeed;
     protected float currentSpeed;
     protected float animationTimer;
     protected float secPerFrame;
     protected int rotation;
 
-    public Creature(GameMap gameMap, float baseSpeed, GameMap.MapObject mapObject) {
+    public Creature(GameMap gameMap, GameObject gameObject) {
         this.gameMap = gameMap;
-        this.mapObject = mapObject;
-        this.baseSpeed = baseSpeed;
-        this.currentSpeed = baseSpeed;
+        this.gameObject = gameObject;
+        this.currentSpeed = BASE_SPEED;
         this.currentWorldPosition = new Vector2();
         this.currentMapPosition = new Vector2();
         this.destination = new Vector2();
@@ -38,10 +38,11 @@ public abstract class Creature {
         this.direction = new Vector2();
         this.animationTimer = 0.0f;
         this.secPerFrame = 0.08f;
+        this.textureRegions = Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split(SIZE, SIZE)[gameObject.getTextureRegionIndex()];
     }
 
     public void initPosition() {
-        currentMapPosition.set(gameMap.getStartPosition(mapObject));
+        currentMapPosition.set(gameMap.getStartPosition(gameObject));
         currentWorldPosition.set(currentMapPosition).scl(SIZE);
         destination.set(currentWorldPosition);
         velocity.set(0, 0);
@@ -79,8 +80,8 @@ public abstract class Creature {
         {
             getDirection();
             if (direction.len() != 0) {
-                destination.x += GameScreen.WORLD_CELL_PX * direction.x;
-                destination.y += GameScreen.WORLD_CELL_PX * direction.y;
+                destination.x += WORLD_CELL_PX * direction.x;
+                destination.y += WORLD_CELL_PX * direction.y;
                 updateRotation();
                 action = Action.MOVING;
                 updateVelocity();
@@ -101,7 +102,7 @@ public abstract class Creature {
     }
 
     private void updateVelocity() {
-        velocity.set(destination).sub(currentWorldPosition).nor().scl(baseSpeed);
+        velocity.set(destination).sub(currentWorldPosition).nor().scl(currentSpeed);
     }
 
     protected abstract void getDirection();

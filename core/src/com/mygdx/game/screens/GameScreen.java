@@ -7,16 +7,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Assets;
+import com.mygdx.game.GameConstants;
 import com.mygdx.game.GameMap;
 import com.mygdx.game.creatures.Ghost;
 import com.mygdx.game.creatures.Pacman;
 
-public class GameScreen implements Screen {
-    public static final int WORLD_CELL_PX = 80;
-    public static final float BASE_SPEED = 200;
-    private static final int EATABLE_GHOSTS_TIMER = 5;
-    private static final int PACMAN_ATTACK_TIMER = 5;
-
+public class GameScreen implements Screen, GameConstants {
     private SpriteBatch batch;
     private Camera camera;
     private GameMap gameMap;
@@ -39,10 +35,10 @@ public class GameScreen implements Screen {
         gameMap = new GameMap();
         pacMan = new Pacman(gameMap);
         ghosts = new Ghost[4];
-        ghosts[0] = new Ghost(gameMap, Ghost.GhostType.RED);
-        ghosts[1] = new Ghost(gameMap, Ghost.GhostType.GREEN);
-        ghosts[2] = new Ghost(gameMap, Ghost.GhostType.BLUE);
-        ghosts[3] = new Ghost(gameMap, Ghost.GhostType.PURPLE);
+        ghosts[0] = new Ghost(gameMap, GameObject.RED_GHOST);
+        ghosts[1] = new Ghost(gameMap, GameObject.GREEN_GHOST);
+        ghosts[2] = new Ghost(gameMap, GameObject.BLUE_GHOST);
+        ghosts[3] = new Ghost(gameMap, GameObject.PURPLE_GHOST);
         resetCamera();
         initGameLevel();
     }
@@ -76,16 +72,15 @@ public class GameScreen implements Screen {
     }
 
     public void renderGUI(SpriteBatch batch, BitmapFont font) {
+        resetCamera();
         guiHelper.setLength(0);
         guiHelper.append("Lives: ").append(pacMan.getLives()).append("\nScore: ").append(pacMan.getScore());
-
-        resetCamera();
         batch.setProjectionMatrix(camera.combined);
         font.draw(batch, guiHelper, 20, 700);
     }
 
     public void resetCamera() {
-        camera.position.set(ScreenManager.VIEWPORT_WIDTH / 2, ScreenManager.VIEWPORT_HEIGHT / 2, 0);
+        camera.position.set(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2, 0);
         camera.update();
     }
 
@@ -156,7 +151,7 @@ public class GameScreen implements Screen {
         if (camera.position.y < ScreenManager.VIEWPORT_HEIGHT / 2) {
             camera.position.y = ScreenManager.VIEWPORT_HEIGHT / 2;
         }
-        if (camera.position.x > gameMap.getMapWidht() - ScreenManager.VIEWPORT_WIDTH / 2) {
+        if (camera.position.x > gameMap.getMapWidht() * WORLD_CELL_PX - ScreenManager.VIEWPORT_WIDTH / 2) {
             camera.position.x = gameMap.getMapWidht() * WORLD_CELL_PX - ScreenManager.VIEWPORT_WIDTH / 2;
         }
         if (camera.position.y > gameMap.getMapHeight() * WORLD_CELL_PX - ScreenManager.VIEWPORT_HEIGHT / 2) {

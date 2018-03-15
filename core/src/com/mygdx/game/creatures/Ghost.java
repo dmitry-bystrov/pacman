@@ -8,49 +8,16 @@ import com.mygdx.game.GameMap;
 import com.mygdx.game.screens.GameScreen;
 
 public class Ghost extends Creature {
-    public enum GhostType {
-        RED(0, 1.4f, GameMap.MapObject.RED_GHOST),
-        GREEN(1, 1.3f, GameMap.MapObject.GREEN_GHOST),
-        BLUE(2, 1.2f, GameMap.MapObject.BLUE_GHOST),
-        PURPLE(3, 1.1f, GameMap.MapObject.PURPLE_GHOST);
-
-        private final int textureRegionNumber;
-        private final GameMap.MapObject mapObject;
-        private final float speed;
-
-        GhostType(int textureRegionNumber, float speed, GameMap.MapObject mapObject) {
-            this.textureRegionNumber = textureRegionNumber;
-            this.mapObject = mapObject;
-            this.speed = speed;
-        }
-
-        public int getTextureRegionNumber() {
-            return textureRegionNumber;
-        }
-
-        public GameMap.MapObject getMapObject() {
-            return mapObject;
-        }
-
-        public float getSpeed() {
-            return speed;
-        }
-    }
-
-    public enum WhoIsKilled { PACMAN, GHOST, NOBODY }
-
-    private GhostType ghostType;
     private TextureRegion[] originalTextureRegions;
     private TextureRegion[] eatableTextureRegions;
     private Vector2 targetPosition;
     private boolean chaseMode;
     private boolean eatable;
 
-    public Ghost(GameMap gameMap, GhostType ghostType) {
-        super(gameMap, GameScreen.BASE_SPEED, ghostType.mapObject);
-        this.originalTextureRegions = Assets.getInstance().getAtlas().findRegion("ghosts").split(SIZE, SIZE)[ghostType.getTextureRegionNumber()];
+    public Ghost(GameMap gameMap, GameObject gameObject) {
+        super(gameMap, gameObject);
+        this.originalTextureRegions = textureRegions;
         this.eatableTextureRegions = Assets.getInstance().getAtlas().findRegion("ghosts").split(SIZE, SIZE)[4];
-        this.ghostType = ghostType;
         targetPosition = new Vector2();
         this.chaseMode = false;
         setEatable(false);
@@ -65,11 +32,11 @@ public class Ghost extends Creature {
     public void setEatable(boolean eatable) {
         this.eatable = eatable;
         if (eatable) {
-            this.textureRegions = eatableTextureRegions;
-            currentSpeed = baseSpeed * (ghostType.speed * 0.5f);
+            textureRegions = eatableTextureRegions;
+            currentSpeed = BASE_SPEED * (gameObject.getSpeed() * 0.5f);
         } else {
-            this.textureRegions = originalTextureRegions;
-            currentSpeed = ghostType.speed;
+            textureRegions = originalTextureRegions;
+            currentSpeed = BASE_SPEED * gameObject.getSpeed();
         }
     }
 

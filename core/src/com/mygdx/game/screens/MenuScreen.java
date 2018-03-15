@@ -9,11 +9,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class MenuScreen implements Screen {
     private SpriteBatch batch;
-    private Camera camera;
 
     public MenuScreen(SpriteBatch batch) {
         this.batch = batch;
-        this.camera = new OrthographicCamera(ScreenManager.VIEWPORT_WIDTH, ScreenManager.VIEWPORT_HEIGHT);
     }
 
     @Override
@@ -26,7 +24,6 @@ public class MenuScreen implements Screen {
         update(delta);
         Gdx.gl.glClearColor(0.4f, 0.4f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.setProjectionMatrix(camera.combined);
         batch.begin();
         batch.end();
     }

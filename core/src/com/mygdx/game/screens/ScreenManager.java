@@ -7,15 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Assets;
+import com.mygdx.game.GameConstants;
 import com.mygdx.game.MyGdxGame;
 
-public class ScreenManager {
-    public static final int VIEWPORT_WIDTH = 1280;
-    public static final int VIEWPORT_HEIGHT = 720;
-
-    public enum ScreenType {
-        MENU, GAME
-    }
+public class ScreenManager implements GameConstants {
 
     private MyGdxGame game;
     private SpriteBatch batch;
@@ -55,7 +50,7 @@ public class ScreenManager {
     }
 
     public void resetCamera() {
-        camera.position.set(640, 360, 0);
+        camera.position.set(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2, 0);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
     }
