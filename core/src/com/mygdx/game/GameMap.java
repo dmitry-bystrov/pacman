@@ -108,6 +108,9 @@ public class GameMap {
         for (int y = 0; y < list.size(); y++) {
             for (int x = 0; x < list.get(y).length(); x++) {
                 mapData[x][y] = MapObject.getObject(list.get(y).charAt(x));
+                if (mapData[x][y] == MapObject.FOOD || mapData[x][y] == MapObject.XFOOD) {
+                    foodCount++;
+                }
                 if (mapData[x][y].isCreature()) {
                     startPositions.put(mapData[x][y], new Vector2(x, y));
                     mapData[x][y] = MapObject.EMPTY;
