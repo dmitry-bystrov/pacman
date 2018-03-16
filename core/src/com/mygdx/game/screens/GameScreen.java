@@ -22,8 +22,10 @@ public class GameScreen implements Screen, GameConstants {
     private Ghost[] ghosts;
     private BitmapFont font48;
     private boolean ghostsEatable;
+    private boolean levelComplete;
     private float eatableGhostsTimer;
     private float packmanAttackTimer;
+    private float levelCompleteTimer;
     private StringBuilder guiHelper;
     private int level;
 
@@ -51,6 +53,8 @@ public class GameScreen implements Screen, GameConstants {
 
     private void initGameLevel() {
         level++;
+        levelComplete = false;
+        levelCompleteTimer = 0;
         ghostsEatable = false;
         eatableGhostsTimer = 0;
         packmanAttackTimer = 0;
@@ -93,6 +97,9 @@ public class GameScreen implements Screen, GameConstants {
         guiHelper.setLength(0);
         guiHelper.append("Level: ").append(level).append("\nLives: ").append(pacMan.getLives()).append("\nScore: ").append(pacMan.getScore());
         font48.draw(batch, guiHelper, 20, 700);
+        if (levelComplete) {
+            font48.draw(batch, "Level Complete", 0, 600, VIEWPORT_WIDTH, 1, false);
+        }
     }
 
     public void resetCamera() {
@@ -150,9 +157,17 @@ public class GameScreen implements Screen, GameConstants {
     }
 
     private void update(float dt) {
-
+        cameraTrackPackman();
         if (Gdx.input.justTouched() && Gdx.input.getY() < 50) {
             ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
+        }
+
+        if (levelComplete) {
+            levelCompleteTimer += dt;
+            if (levelCompleteTimer > 1) {
+                initGameLevel();
+            }
+            return;
         }
 
         updateContacts(dt);
@@ -165,11 +180,8 @@ public class GameScreen implements Screen, GameConstants {
 
         pacMan.update(dt);
         if (gameMap.getFoodCount() == 0) {
-            System.out.println("Pacman WIN!");
-            initGameLevel();
+            levelComplete = true;
         }
-
-        cameraTrackPackman();
     }
 
     private void cameraTrackPackman() {
