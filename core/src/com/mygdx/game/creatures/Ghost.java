@@ -40,20 +40,19 @@ public class Ghost extends Creature {
 
     @Override
     protected void getDirection() {
+        Direction[] directions = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
         directionVector.x = 0;
         directionVector.y = 0;
 
         if (chaseMode && !eatable) {
             if (targetPosition.dst(currentWorldPosition) > 0) {
-                int[] xDirections = {0,  0, -1, 1};
-                int[] yDirections = {1, -1,  0, 0};
                 float[] distance = new float[4];
                 int minDistance = -1;
                 for (int i = 0; i < 4; i++) {
-                    if (gameMap.isCellEmpty((int)currentMapPosition.x + xDirections[i],
-                            (int)currentMapPosition.y + yDirections[i])) {
-                        distance[i] = targetPosition.dst(destinationPoint.x + xDirections[i] * SIZE,
-                                destinationPoint.y + yDirections[i] * SIZE);
+                    if (gameMap.isCellEmpty((int)currentMapPosition.x + directions[i].getX(),
+                            (int)currentMapPosition.y + directions[i].getY())) {
+                        distance[i] = targetPosition.dst(destinationPoint.x + directions[i].getX() * SIZE,
+                                destinationPoint.y + directions[i].getY() * SIZE);
                         if (minDistance == -1) {
                             minDistance = i;
                         } else {
@@ -62,8 +61,8 @@ public class Ghost extends Creature {
                     }
                 }
                 if (minDistance != -1) {
-                    directionVector.x = xDirections[minDistance];
-                    directionVector.y = yDirections[minDistance];
+                    directionVector.x = directions[minDistance].getX();
+                    directionVector.y = directions[minDistance].getY();
                     return;
                 }
             } else {
@@ -71,30 +70,13 @@ public class Ghost extends Creature {
             }
         }
 
-        int randomDirection = MathUtils.random(3);
-
-        if (randomDirection == 1) {
-            updateDirection(0 ,1);
-            return;
-        }
-        if (randomDirection == 2) {
-            updateDirection(0 ,-1);
-            return;
-        }
-        if (randomDirection == 3) {
-            updateDirection(-1 ,0);
-            return;
-        }
-        if (randomDirection == 0) {
-            updateDirection(1 ,0);
-            return;
-        }
+        updateDirection(directions[MathUtils.random(3)]);
     }
 
-    private void updateDirection(int x, int y) {
-        if (gameMap.isCellEmpty((int)currentMapPosition.x + x,(int)currentMapPosition.y + y)) {
-            directionVector.x = x;
-            directionVector.y = y;
+    private void updateDirection(Direction d) {
+        if (gameMap.isCellEmpty((int)currentMapPosition.x + d.getX(),(int)currentMapPosition.y + d.getY())) {
+            directionVector.x = d.getX();
+            directionVector.y = d.getY();
         }
     }
 
