@@ -17,6 +17,7 @@ public class ScreenManager implements GameConstants {
     private GameScreen gameScreen;
     private LoadingScreen loadingScreen;
     private MenuScreen menuScreen;
+    private GameOverScreen gameOverScreen;
     private Screen targetScreen;
     private Viewport viewport;
     private Camera camera;
@@ -41,6 +42,7 @@ public class ScreenManager implements GameConstants {
         this.viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
         this.gameScreen = new GameScreen(batch, camera);
         this.menuScreen = new MenuScreen(batch);
+        this.gameOverScreen = new GameOverScreen(batch);
         this.loadingScreen = new LoadingScreen(batch);
     }
 
@@ -56,6 +58,11 @@ public class ScreenManager implements GameConstants {
     }
 
     public void changeScreen(ScreenType type) {
+        if (type == ScreenType.GAME_OVER) {
+            gameOverScreen.setMaxLevel(gameScreen.getLevel());
+            gameOverScreen.setGameStats(gameScreen.getGameStats());
+        }
+
         Screen screen = game.getScreen();
         Assets.getInstance().clear();
         if (screen != null) {
@@ -72,6 +79,11 @@ public class ScreenManager implements GameConstants {
                 game.setScreen(loadingScreen);
                 targetScreen = gameScreen;
                 Assets.getInstance().loadAssets(ScreenType.GAME);
+                break;
+            case GAME_OVER:
+                game.setScreen(loadingScreen);
+                targetScreen = gameOverScreen;
+                Assets.getInstance().loadAssets(ScreenType.GAME_OVER);
                 break;
         }
     }

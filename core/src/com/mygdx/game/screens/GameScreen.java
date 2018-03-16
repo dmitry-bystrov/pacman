@@ -12,6 +12,8 @@ import com.mygdx.game.GameMap;
 import com.mygdx.game.creatures.Ghost;
 import com.mygdx.game.creatures.Pacman;
 
+import java.util.LinkedHashMap;
+
 public class GameScreen implements Screen, GameConstants {
     private SpriteBatch batch;
     private Camera camera;
@@ -22,6 +24,8 @@ public class GameScreen implements Screen, GameConstants {
     private float eatableGhostsTimer;
     private float packmanAttackTimer;
     private StringBuilder guiHelper;
+    private boolean ghostsEatable;
+    private int level;
 
     public GameScreen(SpriteBatch batch, Camera camera) {
         this.batch = batch;
@@ -31,7 +35,7 @@ public class GameScreen implements Screen, GameConstants {
 
     @Override
     public void show() {
-        font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf");
+        level = 0;
         gameMap = new GameMap();
         pacMan = new Pacman(gameMap);
         ghosts = new Ghost[4];
@@ -41,17 +45,28 @@ public class GameScreen implements Screen, GameConstants {
         ghosts[3] = new Ghost(gameMap, GameObject.PURPLE_GHOST);
         resetCamera();
         initGameLevel();
+        font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf");
     }
 
     private void initGameLevel() {
+        level++;
+        ghostsEatable = false;
         eatableGhostsTimer = 0;
         packmanAttackTimer = 0;
         gameMap.initMap();
         pacMan.initPosition();
         for (int i = 0; i < ghosts.length; i++) {
-            ghosts[i].setEatable(false);
             ghosts[i].initPosition();
+            ghosts[i].setEatable(ghostsEatable);
         }
+    }
+
+    public LinkedHashMap<GameObject, Integer> getGameStats() {
+        return pacMan.getStats();
+    }
+
+    public int getLevel() {
+        return level;
     }
 
     @Override
@@ -67,16 +82,16 @@ public class GameScreen implements Screen, GameConstants {
         for (int i = 0; i < ghosts.length; i++) {
             ghosts[i].render(batch);
         }
-        renderGUI(batch, font48);
+        renderGUI(batch);
         batch.end();
     }
 
-    public void renderGUI(SpriteBatch batch, BitmapFont font) {
+    public void renderGUI(SpriteBatch batch) {
         resetCamera();
-        guiHelper.setLength(0);
-        guiHelper.append("Lives: ").append(pacMan.getLives()).append("\nScore: ").append(pacMan.getScore());
         batch.setProjectionMatrix(camera.combined);
-        font.draw(batch, guiHelper, 20, 700);
+        guiHelper.setLength(0);
+        guiHelper.append("Level: ").append(level).append("\nLives: ").append(pacMan.getLives()).append("\nScore: ").append(pacMan.getScore());
+        font48.draw(batch, guiHelper, 20, 700);
     }
 
     public void resetCamera() {
@@ -84,8 +99,7 @@ public class GameScreen implements Screen, GameConstants {
         camera.update();
     }
 
-    private void update(float dt) {
-
+    private void updateGhostsTargetCell(float dt) {
         packmanAttackTimer += dt;
         if (packmanAttackTimer >= PACMAN_ATTACK_TIMER) {
             for (int i = 0; i < ghosts.length; i++) {
@@ -93,53 +107,69 @@ public class GameScreen implements Screen, GameConstants {
             }
             packmanAttackTimer = 0;
         }
+    }
 
-        if (eatableGhostsTimer > 0) {
+    private void updatePacmanBeastModeState(float dt) {
+        if (ghostsEatable) {
             eatableGhostsTimer -= dt;
             if (eatableGhostsTimer <= 0) {
+                ghostsEatable = false;
                 for (int i = 0; i < ghosts.length; i++) {
-                    ghosts[i].setEatable(false);
+                    ghosts[i].setEatable(ghostsEatable);
                 }
             }
         }
 
-        if (pacMan.checkFoodEating()) {
-            for (int i = 0; i < ghosts.length; i++) {
-                ghosts[i].setEatable(true);
+        if (pacMan.getAction() == Action.WAITING) {
+            if (pacMan.checkFoodEating()) {
+                ghostsEatable = true;
                 eatableGhostsTimer = EATABLE_GHOSTS_TIMER;
+                for (int i = 0; i < ghosts.length; i++) {
+                    ghosts[i].setEatable(ghostsEatable);
+                }
             }
         }
+    }
 
+    private void updateContacts(float dt) {
+        for (int i = 0; i < ghosts.length; i++) {
+            if (pacMan.getCurrentWorldPosition().dst(ghosts[i].getCurrentWorldPosition()) < pacMan.HALF_SIZE) {
+                if (ghostsEatable) {
+                    pacMan.eatObject(ghosts[i].getGameObject());
+                    ghosts[i].initPosition();
+                } else {
+                    pacMan.decreaseLives();
+                    pacMan.initPosition();
+                }
+            }
+        }
+    }
+
+    private void update(float dt) {
+
+        if (Gdx.input.justTouched() && Gdx.input.getY() < 50) {
+            ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
+        }
+
+        if (pacMan.getLives() == 0) {
+            ScreenManager.getInstance().changeScreen(ScreenType.GAME_OVER);
+        }
+
+        updateContacts(dt);
+        updateGhostsTargetCell(dt);
+        updatePacmanBeastModeState(dt);
+
+        for (int i = 0; i < ghosts.length; i++) {
+            ghosts[i].update(dt);
+        }
+
+        pacMan.update(dt);
         if (gameMap.getFoodCount() == 0) {
             System.out.println("Pacman WIN!");
             initGameLevel();
         }
 
-        for (int i = 0; i < ghosts.length; i++) {
-            switch (ghosts[i].checkContact(pacMan.getCurrentWorldPosition())) {
-                case GHOST:
-                    System.out.println("Ghost is killed!");
-                    ghosts[i].initPosition();
-                    break;
-                case PACMAN:
-                    System.out.println("Packman is killed!");
-                    pacMan.decreaseLives();
-                    if (pacMan.getLives() == 0) {
-                        System.out.println("Game over!");
-                        ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
-                    } else {
-                        pacMan.initPosition();
-                    }
-            }
-
-            ghosts[i].update(dt);
-        }
-        pacMan.update(dt);
         cameraTrackPackman();
-
-        if (Gdx.input.justTouched() && Gdx.input.getY() < 50) {
-            ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
-        }
     }
 
     private void cameraTrackPackman() {

@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
 import com.mygdx.game.GameMap;
-import com.mygdx.game.screens.GameScreen;
 
 public abstract class Creature implements GameConstants {
 
@@ -18,9 +17,9 @@ public abstract class Creature implements GameConstants {
     protected TextureRegion[] textureRegions;
     protected Vector2 currentWorldPosition;
     protected Vector2 currentMapPosition;
-    protected Vector2 direction;
-    protected Vector2 destination;
-    protected Vector2 velocity;
+    protected Vector2 directionVector;
+    protected Vector2 destinationPoint;
+    protected Vector2 velocityVector;
     protected Action action;
     protected float currentSpeed;
     protected float animationTimer;
@@ -33,9 +32,9 @@ public abstract class Creature implements GameConstants {
         this.currentSpeed = BASE_SPEED;
         this.currentWorldPosition = new Vector2();
         this.currentMapPosition = new Vector2();
-        this.destination = new Vector2();
-        this.velocity = new Vector2();
-        this.direction = new Vector2();
+        this.destinationPoint = new Vector2();
+        this.velocityVector = new Vector2();
+        this.directionVector = new Vector2();
         this.animationTimer = 0.0f;
         this.secPerFrame = 0.08f;
         this.textureRegions = Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split(SIZE, SIZE)[gameObject.getTextureRegionIndex()];
@@ -44,9 +43,9 @@ public abstract class Creature implements GameConstants {
     public void initPosition() {
         currentMapPosition.set(gameMap.getStartPosition(gameObject));
         currentWorldPosition.set(currentMapPosition).scl(SIZE);
-        destination.set(currentWorldPosition);
-        velocity.set(0, 0);
-        direction.set(0, 0);
+        destinationPoint.set(currentWorldPosition);
+        velocityVector.set(0, 0);
+        directionVector.set(0, 0);
         action = Action.WAITING;
         rotation = 0;
     }
@@ -57,6 +56,10 @@ public abstract class Creature implements GameConstants {
 
     public Vector2 getCurrentWorldPosition() {
         return currentWorldPosition;
+    }
+
+    public GameObject getGameObject() {
+        return gameObject;
     }
 
     public int getCurrentFrame() {
@@ -79,9 +82,9 @@ public abstract class Creature implements GameConstants {
         if (action == Action.WAITING)
         {
             getDirection();
-            if (direction.len() != 0) {
-                destination.x += WORLD_CELL_PX * direction.x;
-                destination.y += WORLD_CELL_PX * direction.y;
+            if (directionVector.len() != 0) {
+                destinationPoint.x += WORLD_CELL_PX * directionVector.x;
+                destinationPoint.y += WORLD_CELL_PX * directionVector.y;
                 updateRotation();
                 action = Action.MOVING;
                 updateVelocity();
@@ -89,11 +92,11 @@ public abstract class Creature implements GameConstants {
         }
 
         if (action == Action.MOVING) {
-            float oldDistance = currentWorldPosition.dst(destination);
-            currentWorldPosition.mulAdd(velocity, dt);
-            if (currentWorldPosition.dst(destination) > oldDistance)  {
-                currentWorldPosition.x = destination.x;
-                currentWorldPosition.y = destination.y;
+            float oldDistance = currentWorldPosition.dst(destinationPoint);
+            currentWorldPosition.mulAdd(velocityVector, dt);
+            if (currentWorldPosition.dst(destinationPoint) > oldDistance)  {
+                currentWorldPosition.x = destinationPoint.x;
+                currentWorldPosition.y = destinationPoint.y;
                 currentMapPosition.x = (int) currentWorldPosition.x / SIZE;
                 currentMapPosition.y = (int) currentWorldPosition.y / SIZE;
                 action = Action.WAITING;
@@ -102,7 +105,7 @@ public abstract class Creature implements GameConstants {
     }
 
     private void updateVelocity() {
-        velocity.set(destination).sub(currentWorldPosition).nor().scl(currentSpeed);
+        velocityVector.set(destinationPoint).sub(currentWorldPosition).nor().scl(currentSpeed);
     }
 
     protected abstract void getDirection();

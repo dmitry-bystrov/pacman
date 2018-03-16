@@ -3,9 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.screens.GameScreen;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +22,7 @@ public class GameMap implements GameConstants {
     private int foodCount;
 
     public GameMap() {
-        textures = new HashMap<>();
+        this.textures = new HashMap<>();
         putTexture(GameObject.EMPTY_CELL);
         putTexture(GameObject.WALL);
         putTexture(GameObject.FOOD);
@@ -111,7 +109,6 @@ public class GameMap implements GameConstants {
         if (gameObject.isFood()) {
             mapData[x][y] = GameObject.EMPTY_CELL;
             foodCount--;
-            System.out.println(foodCount);
         }
         return gameObject;
     }

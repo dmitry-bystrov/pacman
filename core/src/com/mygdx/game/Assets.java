@@ -44,6 +44,12 @@ public class Assets {
                 assetManager.load(PACMAN_PACK, TextureAtlas.class);
                 createStandardFont(48);
                 break;
+            case GAME_OVER:
+                assetManager.load(PACMAN_PACK, TextureAtlas.class);
+                createStandardFont(32);
+                createStandardFont(48);
+                createStandardFont(96);
+                break;
         }
     }
 

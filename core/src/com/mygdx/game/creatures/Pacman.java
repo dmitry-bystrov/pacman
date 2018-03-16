@@ -2,17 +2,40 @@ package com.mygdx.game.creatures;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.mygdx.game.Assets;
 import com.mygdx.game.GameMap;
-import com.mygdx.game.screens.GameScreen;
+
+import java.util.LinkedHashMap;
 
 public class Pacman extends Creature {
     private int lives;
     private int score;
+    private LinkedHashMap<GameObject, Integer> eatenObjects;
 
     public Pacman(GameMap gameMap) {
         super(gameMap, GameObject.PACMAN);
-        lives = MAX_LIVES;
+        this.lives = MAX_LIVES;
+        this.score = 0;
+        this.eatenObjects = new LinkedHashMap<>();
+        initStats();
+    }
+
+    public void initStats() {
+        score = 0;
+        eatenObjects.clear();
+        for (GameObject o:GameObject.values()) {
+            if (o.isFood() || o.isCreature() && o != this.gameObject) {
+                eatenObjects.put(o, 0);
+            }
+        }
+    }
+
+    public LinkedHashMap<GameObject, Integer> getStats() {
+        return eatenObjects;
+    }
+
+    public void eatObject(GameObject gameObject) {
+        eatenObjects.put(gameObject, eatenObjects.get(gameObject) + 1);
+        score += gameObject.getScore();
     }
 
     public int getLives() {
@@ -23,15 +46,14 @@ public class Pacman extends Creature {
         return score;
     }
 
+    public Action getAction() { return action; }
+
     public boolean checkFoodEating() {
-        if (action == Action.WAITING) {
-            GameObject uncknownObject = gameMap.checkFood((int)currentMapPosition.x, (int)currentMapPosition.y);
-            if (uncknownObject.isFood()) {
-                score += uncknownObject.getScore();
-                return uncknownObject == GameObject.XFOOD;
-            }
+        GameObject uncknownObject = gameMap.checkFood((int)currentMapPosition.x, (int)currentMapPosition.y);
+        if (uncknownObject.isFood()) {
+            eatObject(uncknownObject);
         }
-        return false;
+        return uncknownObject == GameObject.XFOOD;
     }
 
     public void decreaseLives() {
@@ -40,39 +62,39 @@ public class Pacman extends Creature {
 
     @Override
     protected void getDirection() {
-        direction.x = 0;
-        direction.y = 0;
+        directionVector.x = 0;
+        directionVector.y = 0;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            updateDirection(0 ,1);
+            updateDirection(Direction.UP);
             return;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            updateDirection(0 ,-1);
+            updateDirection(Direction.DOWN);
             return;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            updateDirection(-1 ,0);
+            updateDirection(Direction.LEFT);
             return;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            updateDirection(1 ,0);
+            updateDirection(Direction.RIGHT);
             return;
         }
     }
 
-    private void updateDirection(int x, int y) {
-        if (gameMap.isCellEmpty((int)currentMapPosition.x + x,(int)currentMapPosition.y + y)) {
-            direction.x = x;
-            direction.y = y;
+    private void updateDirection(Direction d) {
+        if (gameMap.isCellEmpty((int)currentMapPosition.x + d.getX(),(int)currentMapPosition.y + d.getY())) {
+            directionVector.x = d.getX();
+            directionVector.y = d.getY();
         }
     }
 
     @Override
     protected void updateRotation() {
-        if (direction.x == 1) rotation = 0;
-        if (direction.y == 1) rotation = 90;
-        if (direction.x == -1) rotation = 180;
-        if (direction.y == -1) rotation = 270;
+        if (directionVector.x == 1) rotation = 0;
+        if (directionVector.y == 1) rotation = 90;
+        if (directionVector.x == -1) rotation = 180;
+        if (directionVector.y == -1) rotation = 270;
     }
 }

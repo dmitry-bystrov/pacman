@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameMap;
-import com.mygdx.game.screens.GameScreen;
 
 public class Ghost extends Creature {
     private TextureRegion[] originalTextureRegions;
@@ -18,9 +17,8 @@ public class Ghost extends Creature {
         super(gameMap, gameObject);
         this.originalTextureRegions = textureRegions;
         this.eatableTextureRegions = Assets.getInstance().getAtlas().findRegion("ghosts").split(SIZE, SIZE)[4];
-        targetPosition = new Vector2();
+        this.targetPosition = new Vector2();
         this.chaseMode = false;
-        setEatable(false);
         secPerFrame = 0.3f;
     }
 
@@ -40,21 +38,10 @@ public class Ghost extends Creature {
         }
     }
 
-    public WhoIsKilled checkContact(Vector2 pacmanPosition) {
-        if (pacmanPosition.dst(currentWorldPosition) < HALF_SIZE) {
-            if (eatable) {
-                return WhoIsKilled.GHOST;
-            } else {
-                return WhoIsKilled.PACMAN;
-            }
-        }
-        return WhoIsKilled.NOBODY;
-    }
-
     @Override
     protected void getDirection() {
-        direction.x = 0;
-        direction.y = 0;
+        directionVector.x = 0;
+        directionVector.y = 0;
 
         if (chaseMode && !eatable) {
             if (targetPosition.dst(currentWorldPosition) > 0) {
@@ -65,8 +52,8 @@ public class Ghost extends Creature {
                 for (int i = 0; i < 4; i++) {
                     if (gameMap.isCellEmpty((int)currentMapPosition.x + xDirections[i],
                             (int)currentMapPosition.y + yDirections[i])) {
-                        distance[i] = targetPosition.dst(destination.x + xDirections[i] * SIZE,
-                                destination.y + yDirections[i] * SIZE);
+                        distance[i] = targetPosition.dst(destinationPoint.x + xDirections[i] * SIZE,
+                                destinationPoint.y + yDirections[i] * SIZE);
                         if (minDistance == -1) {
                             minDistance = i;
                         } else {
@@ -75,8 +62,8 @@ public class Ghost extends Creature {
                     }
                 }
                 if (minDistance != -1) {
-                    direction.x = xDirections[minDistance];
-                    direction.y = yDirections[minDistance];
+                    directionVector.x = xDirections[minDistance];
+                    directionVector.y = yDirections[minDistance];
                     return;
                 }
             } else {
@@ -106,16 +93,16 @@ public class Ghost extends Creature {
 
     private void updateDirection(int x, int y) {
         if (gameMap.isCellEmpty((int)currentMapPosition.x + x,(int)currentMapPosition.y + y)) {
-            direction.x = x;
-            direction.y = y;
+            directionVector.x = x;
+            directionVector.y = y;
         }
     }
 
     @Override
     protected void updateRotation() {
-        if (direction.x == 1) rotation = 0;
-        if (direction.y == 1) rotation = 0;
-        if (direction.x == -1) rotation = 180;
-        if (direction.y == -1) rotation = 0;
+        if (directionVector.x == 1) rotation = 0;
+        if (directionVector.y == 1) rotation = 0;
+        if (directionVector.x == -1) rotation = 180;
+        if (directionVector.y == -1) rotation = 0;
     }
 }
