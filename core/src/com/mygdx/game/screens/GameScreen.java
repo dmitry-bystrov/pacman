@@ -21,10 +21,10 @@ public class GameScreen implements Screen, GameConstants {
     private Pacman pacMan;
     private Ghost[] ghosts;
     private BitmapFont font48;
+    private boolean ghostsEatable;
     private float eatableGhostsTimer;
     private float packmanAttackTimer;
     private StringBuilder guiHelper;
-    private boolean ghostsEatable;
     private int level;
 
     public GameScreen(SpriteBatch batch, Camera camera) {
@@ -139,8 +139,11 @@ public class GameScreen implements Screen, GameConstants {
                     pacMan.eatObject(ghosts[i].getGameObject());
                     ghosts[i].initPosition();
                 } else {
-                    pacMan.decreaseLives();
                     pacMan.initPosition();
+                    pacMan.decreaseLives();
+                    if (pacMan.getLives() == 0) {
+                        ScreenManager.getInstance().changeScreen(ScreenType.GAME_OVER);
+                    }
                 }
             }
         }
@@ -150,10 +153,6 @@ public class GameScreen implements Screen, GameConstants {
 
         if (Gdx.input.justTouched() && Gdx.input.getY() < 50) {
             ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
-        }
-
-        if (pacMan.getLives() == 0) {
-            ScreenManager.getInstance().changeScreen(ScreenType.GAME_OVER);
         }
 
         updateContacts(dt);

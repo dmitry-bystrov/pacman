@@ -11,7 +11,6 @@ public interface GameConstants {
 
     enum ScreenType { MENU, GAME, GAME_OVER }
     enum Action { WAITING, MOVING, DIEING }
-    enum WhoIsKilled { PACMAN, GHOST, NOBODY }
 
     enum Direction {
         LEFT(-1, 0), RIGHT(1, 0), UP(0, 1), DOWN(0, -1);
