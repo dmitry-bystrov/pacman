@@ -45,6 +45,7 @@ public class GameScreen implements Screen, GameConstants {
         ghosts[3] = new Ghost(gameMap, GameObject.PURPLE_GHOST);
         resetCamera();
         initGameLevel();
+        pacMan.initStats();
         font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf");
     }
 

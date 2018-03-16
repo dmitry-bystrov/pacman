@@ -62,6 +62,7 @@ public class GameOverScreen implements Screen, GameConstants {
     }
 
     public void setGameStats(LinkedHashMap<GameObject, Integer> gameStats) {
+        totalScore = 0;
         this.gameStats.clear();
         this.gameStats.putAll(gameStats);
         Iterator<Map.Entry<GameObject, Integer>> iter = gameStats.entrySet().iterator();
