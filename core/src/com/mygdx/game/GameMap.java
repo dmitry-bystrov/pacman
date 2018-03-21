@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class GameMap implements GameConstants {
 
-    public static final String MAP_FILE_NAME = "map2.dat";
+    public static final String MAP_FILE_NAME = "map3.dat";
     private GameObject[][] mapData;
     private HashMap<GameObject, TextureRegion> textures;
     private HashMap<GameObject, Vector2> startPositions;
