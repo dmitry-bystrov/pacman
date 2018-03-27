@@ -46,8 +46,6 @@ public class Pacman extends Creature {
         return score;
     }
 
-    public Action getAction() { return action; }
-
     public boolean checkFoodEating() {
         GameObject uncknownObject = gameMap.checkFood((int)currentMapPosition.x, (int)currentMapPosition.y);
         if (uncknownObject.isFood()) {

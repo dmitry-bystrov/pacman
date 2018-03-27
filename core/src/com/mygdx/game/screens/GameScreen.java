@@ -111,7 +111,11 @@ public class GameScreen implements Screen, GameConstants {
         packmanAttackTimer += dt;
         if (packmanAttackTimer >= PACMAN_ATTACK_TIMER) {
             for (int i = 0; i < ghosts.length; i++) {
-                ghosts[i].setTargetCell(pacMan.getCurrentMapPosition());
+                if (pacMan.getAction() != Action.RECOVERING) {
+                    ghosts[i].setTargetCell(pacMan.getCurrentMapPosition());
+                } else {
+                    ghosts[i].setTargetCell(gameMap.getStartPosition(ghosts[i].getGameObject()));
+                }
             }
             packmanAttackTimer = 0;
         }
@@ -140,14 +144,16 @@ public class GameScreen implements Screen, GameConstants {
     }
 
     private void updateContacts(float dt) {
+        if (pacMan.getAction() == Action.RECOVERING) return;
         for (int i = 0; i < ghosts.length; i++) {
+            if (ghosts[i].getAction() == Action.RECOVERING) continue;
             if (pacMan.getCurrentWorldPosition().dst(ghosts[i].getCurrentWorldPosition()) < pacMan.HALF_SIZE) {
                 if (ghostsEatable) {
                     pacMan.eatObject(ghosts[i].getGameObject());
-                    ghosts[i].initPosition();
+                    ghosts[i].respawn();
                 } else {
-                    pacMan.initPosition();
                     pacMan.decreaseLives();
+                    pacMan.respawn();
                     if (pacMan.getLives() == 0) {
                         ScreenManager.getInstance().changeScreen(ScreenType.GAME_OVER);
                     }
@@ -169,6 +175,8 @@ public class GameScreen implements Screen, GameConstants {
             }
             return;
         }
+
+        //if (true) return;
 
         updateContacts(dt);
         updateGhostsTargetCell(dt);

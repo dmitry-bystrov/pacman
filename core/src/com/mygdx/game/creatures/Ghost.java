@@ -15,6 +15,7 @@ public class Ghost extends Creature {
 
     public Ghost(GameMap gameMap, GameObject gameObject) {
         super(gameMap, gameObject);
+
         this.originalTextureRegions = textureRegions;
         this.eatableTextureRegions = Assets.getInstance().getAtlas().findRegion("ghosts").split(SIZE, SIZE)[4];
         this.targetPosition = new Vector2();

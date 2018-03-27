@@ -5,12 +5,13 @@ public interface GameConstants {
     int WORLD_CELL_PX = 80;
     float BASE_SPEED = 200;
     int EATABLE_GHOSTS_TIMER = 5;
-    int PACMAN_ATTACK_TIMER = 2;
+    int PACMAN_ATTACK_TIMER = 1;
+    int GHOST_RECOVERY_TIMER = 5;
     int VIEWPORT_WIDTH = 1280;
     int VIEWPORT_HEIGHT = 720;
 
     enum ScreenType { MENU, GAME, GAME_OVER }
-    enum Action { WAITING, MOVING, DIEING }
+    enum Action { WAITING, MOVING, DIEING, RECOVERING }
 
     enum Direction {
         LEFT(-1, 0), RIGHT(1, 0), UP(0, 1), DOWN(0, -1);
