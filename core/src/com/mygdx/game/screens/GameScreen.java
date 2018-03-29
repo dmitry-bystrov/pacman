@@ -28,6 +28,7 @@ public class GameScreen implements Screen, GameConstants {
     private float levelCompleteTimer;
     private StringBuilder guiHelper;
     private int level;
+    private Difficulty difficulty;
 
     public GameScreen(SpriteBatch batch, Camera camera) {
         this.batch = batch;
@@ -37,18 +38,22 @@ public class GameScreen implements Screen, GameConstants {
 
     @Override
     public void show() {
-        level = 0;
-        gameMap = new GameMap();
-        pacMan = new Pacman(gameMap);
-        ghosts = new Ghost[4];
-        ghosts[0] = new Ghost(gameMap, GameObject.RED_GHOST);
-        ghosts[1] = new Ghost(gameMap, GameObject.GREEN_GHOST);
-        ghosts[2] = new Ghost(gameMap, GameObject.BLUE_GHOST);
-        ghosts[3] = new Ghost(gameMap, GameObject.PURPLE_GHOST);
-        resetCamera();
-        initGameLevel();
-        pacMan.initStats();
-        font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf");
+        this.level = 0;
+        //difficulty = Difficulty.NEWBIE;
+        //difficulty = Difficulty.MIDDLE;
+        //difficulty = Difficulty.EXPERT;
+        difficulty = Difficulty.NIGHTMARE;
+        this.gameMap = new GameMap();
+        this.pacMan = new Pacman(gameMap, difficulty);
+        this.ghosts = new Ghost[4];
+        this.ghosts[0] = new Ghost(gameMap, GameObject.RED_GHOST, difficulty);
+        this.ghosts[1] = new Ghost(gameMap, GameObject.GREEN_GHOST, difficulty);
+        this.ghosts[2] = new Ghost(gameMap, GameObject.BLUE_GHOST, difficulty);
+        this.ghosts[3] = new Ghost(gameMap, GameObject.PURPLE_GHOST, difficulty);
+        this.resetCamera();
+        this.initGameLevel();
+        this.pacMan.initStats();
+        this.font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf");
     }
 
     private void initGameLevel() {
@@ -109,7 +114,7 @@ public class GameScreen implements Screen, GameConstants {
 
     private void updateGhostsTargetCell(float dt) {
         packmanAttackTimer += dt;
-        if (packmanAttackTimer >= PACMAN_ATTACK_TIMER) {
+        if (packmanAttackTimer >= difficulty.getPacmanAttackTimer()) {
             for (int i = 0; i < ghosts.length; i++) {
                 if (pacMan.getAction() != Action.RECOVERING) {
                     ghosts[i].setTargetCell(pacMan.getCurrentMapPosition());
@@ -135,7 +140,7 @@ public class GameScreen implements Screen, GameConstants {
         if (pacMan.getAction() == Action.WAITING) {
             if (pacMan.checkFoodEating()) {
                 ghostsEatable = true;
-                eatableGhostsTimer = EATABLE_GHOSTS_TIMER;
+                eatableGhostsTimer = difficulty.getEatableGhostTimer();
                 for (int i = 0; i < ghosts.length; i++) {
                     ghosts[i].setEatable(ghostsEatable);
                 }

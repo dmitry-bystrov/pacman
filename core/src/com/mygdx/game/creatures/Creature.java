@@ -28,14 +28,16 @@ public abstract class Creature implements GameConstants {
     protected float animationTimer;
     protected float secPerFrame;
     protected int rotation;
-    private float recoveryTimer;
-    private static Texture healthBarFill;
-    private static Texture healthBarBorder;
+    protected float recoveryTimer;
+    protected static Texture healthBarFill;
+    protected static Texture healthBarBorder;
+    protected Difficulty difficulty;
 
 
-    public Creature(GameMap gameMap, GameObject gameObject) {
+    public Creature(GameMap gameMap, GameObject gameObject, Difficulty difficulty) {
         this.gameMap = gameMap;
         this.gameObject = gameObject;
+        this.difficulty = difficulty;
         this.currentSpeed = BASE_SPEED;
         this.currentWorldPosition = new Vector2();
         this.currentMapPosition = new Vector2();
@@ -97,26 +99,28 @@ public abstract class Creature implements GameConstants {
         if ((rotation == 180) != textureRegions[getCurrentFrame()].isFlipY()) {
             textureRegions[getCurrentFrame()].flip(false, true);
         }
-        batch.draw(textureRegions[getCurrentFrame()], currentWorldPosition.x, currentWorldPosition.y, HALF_SIZE, HALF_SIZE, SIZE, SIZE, 1, 1, rotation);
+
         if (action == Action.RECOVERING) {
-            batch.draw(healthBarFill, currentWorldPosition.x, currentWorldPosition.y + 90, 80 * (recoveryTimer / GHOST_RECOVERY_TIMER), 10);
+            batch.draw(healthBarFill, currentWorldPosition.x, currentWorldPosition.y + 90, 80 * (recoveryTimer / difficulty.getRecoveryTimer()), 10);
             batch.draw(healthBarBorder, currentWorldPosition.x, currentWorldPosition.y + 90, 80, 10);
+            if (animationTimer % 0.2f > 0.1f) return;
         }
+        batch.draw(textureRegions[getCurrentFrame()], currentWorldPosition.x, currentWorldPosition.y, HALF_SIZE, HALF_SIZE, SIZE, SIZE, 1, 1, rotation);
     }
 
     public void update(float dt) {
+        animationTimer += dt;
+        if (animationTimer >= textureRegions.length * secPerFrame) {
+            animationTimer = 0.0f;
+        }
+
         if (action == Action.RECOVERING) {
             recoveryTimer += dt;
-            if (recoveryTimer > GHOST_RECOVERY_TIMER) {
+            if (recoveryTimer > difficulty.getRecoveryTimer()) {
                 action = Action.WAITING;
                 recoveryTimer = 0;
             }
             return;
-        }
-
-        animationTimer += dt;
-        if (animationTimer >= textureRegions.length * secPerFrame) {
-            animationTimer = 0.0f;
         }
 
         if (action == Action.WAITING)

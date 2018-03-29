@@ -3,15 +3,60 @@ package com.mygdx.game;
 public interface GameConstants {
     int MAX_LIVES = 3;
     int WORLD_CELL_PX = 80;
-    float BASE_SPEED = 200;
-    int EATABLE_GHOSTS_TIMER = 5;
-    int PACMAN_ATTACK_TIMER = 1;
-    int GHOST_RECOVERY_TIMER = 5;
+    float BASE_SPEED = 220;
+
     int VIEWPORT_WIDTH = 1280;
     int VIEWPORT_HEIGHT = 720;
 
     enum ScreenType { MENU, GAME, GAME_OVER }
     enum Action { WAITING, MOVING, DIEING, RECOVERING }
+
+    enum Difficulty {
+        NEWBIE(4, 8, 8, 1.2f, 0.4f, false),
+        MIDDLE(4, 6, 6, 1.4f, 0.6f, true),
+        EXPERT(2, 4, 4, 1.6f, 0.8f, true),
+        NIGHTMARE(1, 2, 2, 1.8f, 1.0f, true);
+
+        private int pacmanAttackTimer;
+        private int eatableGhostTimer;
+        private int recoveryTimer;
+        private float ghostsAcceleration;
+        private float ghostsDeceleration;
+        private boolean smartAI;
+
+        Difficulty(int pacmanAttackTimer, int eatableGhostTimer, int recoveryTimer, float ghostsAcceleration, float ghostsDeceleration, boolean smartAI) {
+            this.pacmanAttackTimer = pacmanAttackTimer;
+            this.eatableGhostTimer = eatableGhostTimer;
+            this.recoveryTimer = recoveryTimer;
+            this.ghostsAcceleration = ghostsAcceleration;
+            this.ghostsDeceleration = ghostsDeceleration;
+            this.smartAI = smartAI;
+        }
+
+        public int getPacmanAttackTimer() {
+            return pacmanAttackTimer;
+        }
+
+        public int getEatableGhostTimer() {
+            return eatableGhostTimer;
+        }
+
+        public int getRecoveryTimer() {
+            return recoveryTimer;
+        }
+
+        public float getGhostsAcceleration() {
+            return ghostsAcceleration;
+        }
+
+        public float getGhostsDeceleration() {
+            return ghostsDeceleration;
+        }
+
+        public boolean isSmartAI() {
+            return smartAI;
+        }
+    }
 
     enum Direction {
         LEFT(-1, 0), RIGHT(1, 0), UP(0, 1), DOWN(0, -1);
@@ -31,32 +76,41 @@ public interface GameConstants {
         public int getY() {
             return y;
         }
+
+        public Direction invert() {
+            switch (this) {
+                case RIGHT: return LEFT;
+                case LEFT: return RIGHT;
+                case UP: return DOWN;
+                case DOWN: return UP;
+            }
+
+            return null;
+        }
     }
 
     enum GameObject {
-        PACMAN('s', true, false, 1.0f, 0, "pacman", 0),
-        FOOD('_', false, true, .0f, 5, "food", 0),
-        XFOOD('*', false, true, .0f, 10, "xfood", 0),
-        RED_GHOST('r', true, false, 1.4f, 50, "ghosts", 0),
-        GREEN_GHOST('g', true, false, 1.3f, 40, "ghosts", 1),
-        BLUE_GHOST('b', true, false, 1.2f, 30, "ghosts", 2),
-        PURPLE_GHOST('p', true, false, 1.1f, 20, "ghosts", 3),
-        WALL('1', false, false, .0f, 0, "wall", 0),
-        EMPTY_CELL('0', false, false, .0f, 0, "ground", 0);
+        PACMAN('s', true, false, 0, "pacman", 0),
+        FOOD('_', false, true, 5, "food", 0),
+        XFOOD('*', false, true, 100, "xfood", 0),
+        RED_GHOST('r', true, false, 500, "ghosts", 0),
+        GREEN_GHOST('g', true, false, 400, "ghosts", 1),
+        BLUE_GHOST('b', true, false, 300, "ghosts", 2),
+        PURPLE_GHOST('p', true, false, 200, "ghosts", 3),
+        WALL('1', false, false, 0, "wall", 0),
+        EMPTY_CELL('0', false, false, 0, "ground", 0);
 
         private final char mapSymbol;
         private final boolean isCreature;
         private final boolean isFood;
-        private final float speed;
         private final int score;
         private final String textureName;
         private final int textureRegionIndex;
 
-        GameObject(char mapSymbol, boolean isCreature, boolean isFood, float speed, int score, String textureName, int textureRegionIndex) {
+        GameObject(char mapSymbol, boolean isCreature, boolean isFood, int score, String textureName, int textureRegionIndex) {
             this.mapSymbol = mapSymbol;
             this.isCreature = isCreature;
             this.isFood = isFood;
-            this.speed = speed;
             this.score = score;
             this.textureName = textureName;
             this.textureRegionIndex = textureRegionIndex;
@@ -79,10 +133,6 @@ public interface GameConstants {
 
         public boolean isFood() {
             return isFood;
-        }
-
-        public float getSpeed() {
-            return speed;
         }
 
         public int getScore() {

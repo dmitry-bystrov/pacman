@@ -11,8 +11,8 @@ public class Pacman extends Creature {
     private int score;
     private LinkedHashMap<GameObject, Integer> eatenObjects;
 
-    public Pacman(GameMap gameMap) {
-        super(gameMap, GameObject.PACMAN);
+    public Pacman(GameMap gameMap, Difficulty difficulty) {
+        super(gameMap, GameObject.PACMAN, difficulty);
         this.lives = MAX_LIVES;
         this.score = 0;
         this.eatenObjects = new LinkedHashMap<>();
