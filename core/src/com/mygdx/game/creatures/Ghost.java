@@ -129,7 +129,7 @@ public class Ghost extends Creature {
         routeMap[(int)targetPosition.x][(int)targetPosition.y] = ROUTE_TARGET_CELL;
         routeMap[startPointX][startPointY] = 0;
 
-        fillRouteMap((int) destinationPoint.x / SIZE, (int) destinationPoint.y / SIZE, routeMap, 1);
+        fillRouteMap(startPointX, startPointY, routeMap, 1);
     }
 
     // рекурсивный обход карты для поиска кратчайшего маршрута
