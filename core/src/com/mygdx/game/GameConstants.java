@@ -11,11 +11,19 @@ public interface GameConstants {
     enum ScreenType { MENU, GAME, GAME_OVER }
     enum Action { WAITING, MOVING, DIEING, RECOVERING }
 
+    // перечисление Difficulty описывает уровни сложности игры
+    // pacmanAttackTimer - как часто призраки узнают местоположение пакмана
+    // eatableGhostTimer - как долго длится режим уязвимости призраков
+    // recoveryTimer - как долго длится восстановление призраков после того как их съел пакман
+    // ghostsAcceleration - на сколько быстрее пакмана двигаются призраки
+    // ghostsDeceleration - на сколько медленнее пакмана двигаются призраки в режиме уязвимости
+    // smartAI - уровень интеллекта призраков
+
     enum Difficulty {
-        NEWBIE(4, 8, 8, 1.2f, 0.4f, false),
-        MIDDLE(4, 6, 6, 1.4f, 0.6f, true),
-        EXPERT(2, 4, 4, 1.6f, 0.8f, true),
-        NIGHTMARE(1, 2, 2, 1.8f, 1.0f, true);
+        NEWBIE(5, 8, 6, 1.0f, 0.4f, false),
+        MIDDLE(4, 6, 5, 1.2f, 0.6f, true),
+        EXPERT(3, 4, 4, 1.4f, 0.8f, true),
+        NIGHTMARE(2, 2, 3, 1.6f, 1.0f, true);
 
         private int pacmanAttackTimer;
         private int eatableGhostTimer;

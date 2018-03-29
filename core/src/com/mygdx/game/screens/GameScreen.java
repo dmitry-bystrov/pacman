@@ -112,6 +112,8 @@ public class GameScreen implements Screen, GameConstants {
         camera.update();
     }
 
+    // призраки не знают где находится пакман, но периодически получают сообщение с его последними координатами
+    // частота таких сообщений зависит от уровня сложности игры
     private void updateGhostsTargetCell(float dt) {
         packmanAttackTimer += dt;
         if (packmanAttackTimer >= difficulty.getPacmanAttackTimer()) {
@@ -119,6 +121,8 @@ public class GameScreen implements Screen, GameConstants {
                 if (pacMan.getAction() != Action.RECOVERING) {
                     ghosts[i].setTargetCell(pacMan.getCurrentMapPosition());
                 } else {
+                    // если пакмана съели и он находится в режиме восстановления, то
+                    // призраки получают приказ разбежаться по домам
                     ghosts[i].setTargetCell(gameMap.getStartPosition(ghosts[i].getGameObject()));
                 }
             }

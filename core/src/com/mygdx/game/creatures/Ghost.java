@@ -10,9 +10,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Ghost extends Creature {
-    public static final int ROUTE_TARGET_CELL = -100;
-    public static final int ROUTE_EMPTY_CELL = -9;
-    public static final int ROUTE_WALL_CELL = -1;
+    private static final int ROUTE_TARGET_CELL = -100;
+    private static final int ROUTE_EMPTY_CELL = -9;
+    private static final int ROUTE_WALL_CELL = -1;
 
     enum RoutingMode { RANDOM_DIRECTION, SIMPLE_ROUTING, SMART_ROUTING }
 
@@ -37,16 +37,20 @@ public class Ghost extends Creature {
         this.routeMap = new int[gameMap.getMapWidht()][gameMap.getMapHeight()];
     }
 
+    // когда призрак получает координаты ячейки, в которую он должен перейти,
+    // выбираем алгоритм поиска пути в зависимости от настроек уровня сложности
     public void setTargetCell(Vector2 targetCell) {
-        if (routingMode == RoutingMode.SMART_ROUTING) return;
-
-        targetPosition.set(targetCell).scl(SIZE);
-        routingMode = RoutingMode.SIMPLE_ROUTING;
+        if (difficulty.isSmartAI()) {
+            findRouteToTargetCell(targetCell);
+            routingMode = RoutingMode.SMART_ROUTING;
+        } else {
+            targetPosition.set(targetCell).scl(SIZE);
+            routingMode = RoutingMode.SIMPLE_ROUTING;
+        }
     }
 
     public void setEatable(boolean eatable) {
-        this.routingMode = RoutingMode.RANDOM_DIRECTION;
-
+        routingMode = RoutingMode.RANDOM_DIRECTION;
         if (eatable) {
             textureRegions = eatableTextureRegions;
             currentSpeed = BASE_SPEED * difficulty.getGhostsDeceleration();
@@ -61,49 +65,57 @@ public class Ghost extends Creature {
         directionVector.x = 0;
         directionVector.y = 0;
 
-        if (routingMode != RoutingMode.RANDOM_DIRECTION && targetPosition.dst(currentWorldPosition) < HALF_SIZE) {
-            routingMode = RoutingMode.RANDOM_DIRECTION;
-        }
+        // в зависимости от уровня сложности и текущей игровой ситуации, призрак может использовать один
+        // из трёх алгоритмов для выбора направления движения
+        //
+        // RANDOM_DIRECTION - выбор направления случайным образом
+        //
+        // SIMPLE_ROUTING - призрак перебирает все возможные направления и выбирает то, движение в котором
+        // сократит расстояние между ним и целевой ячейкой (если на пути движения втретится препятствие,
+        // обойти его он не сможет, а просто выберет какое-нибудь случайное направление и пойдёт туда)
+        //
+        // SMART_ROUTING - призрак строит карту маршрута, выбирает самый кратчайший путь до цели и следует по нему
 
-        if (routingMode == RoutingMode.SIMPLE_ROUTING) {
-            float shortestDistance = targetPosition.dst(currentWorldPosition.x, currentWorldPosition.y);
-            Direction bestDirection = null;
+        switch (routingMode) {
+            case SIMPLE_ROUTING:
+                float shortestDistance = targetPosition.dst(currentWorldPosition.x, currentWorldPosition.y);
+                float newDirectionDistance;
+                int bestDirection = -1;
 
-            for (Direction direction:Direction.values()) {
-                if (gameMap.isCellEmpty((int)currentMapPosition.x + direction.getX(),(int)currentMapPosition.y + direction.getY())) {
-                    float newDirectionDistance = targetPosition.dst(currentWorldPosition.x + direction.getX() * SIZE, currentWorldPosition.y + direction.getX() * SIZE);
-                    if (newDirectionDistance < shortestDistance) {
-                        shortestDistance = newDirectionDistance;
-                        bestDirection = direction;
+                for (Direction direction:Direction.values()) {
+                    if (gameMap.isCellEmpty((int)currentMapPosition.x + direction.getX(),(int)currentMapPosition.y + direction.getY())) {
+                        newDirectionDistance = targetPosition.dst(currentWorldPosition.x + direction.getX() * SIZE, currentWorldPosition.y + direction.getX() * SIZE);
+                        if (newDirectionDistance < shortestDistance) {
+                            shortestDistance = newDirectionDistance;
+                            bestDirection = direction.ordinal();
+                        }
                     }
                 }
-            }
 
-            if (bestDirection != null) {
-                directionVector.x = bestDirection.getX();
-                directionVector.y = bestDirection.getY();
-            } else {
-                // призрак перебрал все направления и оказалось, что куда бы он ни пошел, расстояние до пакмана будет увеличиваться
-                // если призрак умный, то он поймёт, что перед ним препятствие и попытается его обойти
-                // в противном случае он просто выберет какое-нибудь случайное направление и пойдёт туда
-                if (difficulty.isSmartAI()) {
-                    routeToTarget(targetPosition);
+                if (bestDirection == -1) {
+                    routingMode = RoutingMode.RANDOM_DIRECTION;
+                } else {
+                    directionVector.x = Direction.values()[bestDirection].getX();
+                    directionVector.y = Direction.values()[bestDirection].getY();
+                }
+                break;
+            case SMART_ROUTING:
+                if (route.size() > 0) {
+                    directionVector.x = route.get(route.size() - 1).getX();
+                    directionVector.y = route.get(route.size() - 1).getY();
+                    route.remove(route.size() - 1);
                 } else {
                     routingMode = RoutingMode.RANDOM_DIRECTION;
                 }
-            }
+                break;
+            case RANDOM_DIRECTION:
+                getRandomDirection();
+                break;
         }
-
-        if (routingMode == RoutingMode.SMART_ROUTING && route.size() > 0) {
-            directionVector.x = route.get(route.size() - 1).getX();
-            directionVector.y = route.get(route.size() - 1).getY();
-            route.remove(route.size() - 1);
-        }
-
-        if (routingMode == RoutingMode.RANDOM_DIRECTION) getRandomDirection();
     }
 
-    private void routeToTarget(Vector2 targetPosition) {
+    // очищаем маршрутный лист, подготавливаем карту и строим новый маршрут
+    private void findRouteToTargetCell(Vector2 targetPosition) {
         route.clear();
         for (int i = 0; i < routeMap.length; i++) {
             for (int j = 0; j < routeMap[i].length; j++) {
@@ -111,17 +123,23 @@ public class Ghost extends Creature {
             }
         }
 
-        routeMap[(int)targetPosition.x / SIZE][(int)targetPosition.y / SIZE] = ROUTE_TARGET_CELL;
-        routeMap[(int) currentMapPosition.x][(int) currentMapPosition.y] = 0;
+        int startPointX = (int) destinationPoint.x / SIZE;
+        int startPointY = (int) destinationPoint.y / SIZE;
 
-        fillRouteMap((int) currentMapPosition.x, (int) currentMapPosition.y, routeMap, 1);
-        routingMode = RoutingMode.SMART_ROUTING;
+        routeMap[(int)targetPosition.x][(int)targetPosition.y] = ROUTE_TARGET_CELL;
+        routeMap[startPointX][startPointY] = 0;
+
+        fillRouteMap((int) destinationPoint.x / SIZE, (int) destinationPoint.y / SIZE, routeMap, 1);
     }
 
+    // рекурсивный обход карты для поиска кратчайшего маршрута
     private boolean fillRouteMap(int cellX, int cellY, int routeMap[][], int step) {
+        int x;
+        int y;
+
         for (Direction direction:Direction.values()) {
-            int x = cellX + direction.getX();
-            int y = cellY + direction.getY();
+            x = cellX + direction.getX();
+            y = cellY + direction.getY();
 
             if (x < 0 || y < 0 || x >= routeMap.length || y >= routeMap[x].length) continue;
 
@@ -144,6 +162,7 @@ public class Ghost extends Creature {
         return false;
     }
 
+    // когда маршрут найден - проходим по нему в обратном порядке и заполняем маршрутный лист
     private void fillRouteList(int cellX, int cellY, int[][] routeMap, int step) {
         int x;
         int y;
@@ -165,8 +184,10 @@ public class Ghost extends Creature {
         }
     }
 
+    // выбор случайного направления
     private void getRandomDirection() {
         Direction direction;
+
         do {
             direction = Direction.values()[MathUtils.random(3)];
         } while (!gameMap.isCellEmpty((int)currentMapPosition.x + direction.getX(),(int)currentMapPosition.y + direction.getY()));
