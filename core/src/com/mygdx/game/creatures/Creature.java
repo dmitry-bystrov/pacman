@@ -50,14 +50,14 @@ public abstract class Creature implements GameConstants {
         this.textureRegions = Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split(SIZE, SIZE)[gameObject.getTextureRegionIndex()];
 
         if (healthBarFill == null) {
-            Pixmap pixmap = new Pixmap(SIZE, 10, Pixmap.Format.RGB888);
-            pixmap.setColor(Color.GREEN);
+            Pixmap pixmap = new Pixmap(SIZE, 10, Pixmap.Format.RGBA8888);
+            pixmap.setColor(Color.rgba8888(0.68f, 0.92f, 0.28f, 1.0f));
             pixmap.fill();
             healthBarFill = new Texture(pixmap);
         }
         if (healthBarBorder == null) {
             Pixmap pixmap = new Pixmap(SIZE, 10, Pixmap.Format.RGBA8888);
-            pixmap.setColor(Color.GREEN);
+            pixmap.setColor(Color.rgba8888(0.32f, 0.48f, 0.08f, 1.0f));
             pixmap.drawRectangle(0,0,SIZE,10);
             pixmap.drawRectangle(1,1,SIZE - 2,8);
             healthBarBorder = new Texture(pixmap);

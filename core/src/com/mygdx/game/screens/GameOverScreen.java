@@ -102,16 +102,16 @@ public class GameOverScreen implements Screen, GameConstants {
         int yLine = 0;
         while (iter.hasNext()) {
             Map.Entry<GameObject, Integer> entry = iter.next();
-            float imageX = 320 + xLine * 350;
+            float imageX = 120 + xLine * 350;
             float imageY = 400 - (yLine * WORLD_CELL_PX + 5);
-            float textX = 320 + xLine * 350 + WORLD_CELL_PX + 5;
+            float textX = 120 + xLine * 350 + WORLD_CELL_PX + 5;
             float textY = 400 - (yLine * WORLD_CELL_PX + 5) + WORLD_CELL_PX / 2;
             batch.draw(getTexture(entry.getKey())[0], imageX, imageY, WORLD_CELL_PX / 2, WORLD_CELL_PX / 2, WORLD_CELL_PX, WORLD_CELL_PX,1,1,0);
             guiHelper.setLength(0);
             guiHelper.append( ": ").append(entry.getValue()).append("x").append(entry.getKey().getScore());
             font48.draw(batch, guiHelper, textX, textY, 0, -1, false);
             xLine++;
-            if (xLine == 2) {
+            if (xLine == 3) {
                 xLine = 0;
                 yLine ++;
             }

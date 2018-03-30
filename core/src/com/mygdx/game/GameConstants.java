@@ -21,10 +21,10 @@ public interface GameConstants {
     // smartAI - уровень интеллекта призраков
 
     enum Difficulty {
-        NEWBIE(5, 8, 6, 1.0f, 0.4f, false),
-        MIDDLE(4, 6, 5, 1.2f, 0.6f, true),
-        EXPERT(3, 4, 4, 1.4f, 0.8f, true),
-        NIGHTMARE(2, 2, 3, 1.6f, 1.0f, true);
+        NEWBIE(3.0f, 8, 6, 1.0f, 0.4f, false),
+        MIDDLE(3.0f, 6, 5, 1.2f, 0.6f, true),
+        EXPERT(2.5f, 4, 4, 1.4f, 0.8f, true),
+        NIGHTMARE(2.0f, 2, 3, 1.6f, 1.0f, true);
 
         private final float pacmanAttackTimer;
         private final int eatableGhostTimer;
@@ -108,13 +108,13 @@ public interface GameConstants {
         PACMAN('s', true, false, 0, "pacman", 0),
         FOOD('_', false, true, 5, "food", 0),
         XFOOD('*', false, true, 100, "xfood", 0),
-        ORANGE('o', false, true, 200, "orange", 0),
-        BANANA('n', false, true, 200, "banana", 0),
-        APPLE('a', false, true, 200, "apple", 0),
+        BANANA('n', false, true, 350, "banana", 0),
         RED_GHOST('r', true, false, 500, "ghosts", 0),
         GREEN_GHOST('g', true, false, 500, "ghosts", 1),
+        APPLE('a', false, true, 350, "apple", 0),
         BLUE_GHOST('b', true, false, 500, "ghosts", 2),
         PURPLE_GHOST('p', true, false, 500, "ghosts", 3),
+        ORANGE('o', false, true, 350, "orange", 0),
         PIPE('1', false, false, 0, "pipe", 0),
         EMPTY_CELL('0', false, false, 0, "ground", 0);
 

@@ -96,7 +96,7 @@ public class GameMap implements GameConstants {
         for (int y = 0; y < list.size(); y++) {
             for (int x = 0; x < list.get(y).length(); x++) {
                 mapData[x][y] = GameObject.getObject(list.get(y).charAt(x));
-                if (mapData[x][y].isFood()) {
+                if (mapData[x][y] == GameObject.FOOD) {
                     foodCount++;
                 }
                 if (mapData[x][y].isCreature()) {
@@ -141,28 +141,23 @@ public class GameMap implements GameConstants {
         return mapData[cellX][cellY] != GameObject.PIPE;
     }
 
-    public void addFruit() {
-        if (foodCount == 0) return;
-        int randomFood = MathUtils.random(foodCount - 1) + 1;
-        int currentFood = 0;
+    public void addRandomFruit() {
+        int randomX = 0;
+        int randomY = 0;
 
-        for (int i = 0; i < mapData.length; i++) {
-            for (int j = 0; j < mapData[i].length; j++) {
-                if (mapData[i][j].isFood()) {
-                    currentFood++;
-                    if (currentFood == randomFood) {
-                        mapData[i][j] = fruits[MathUtils.random(fruits.length - 1)];
-                    }
-                }
-            }
-        }
+        do {
+            randomX = MathUtils.random(mapData.length - 1);
+            randomY = MathUtils.random(mapData[randomX].length - 1);
+        } while (mapData[randomX][randomY] != GameObject.EMPTY_CELL);
+
+        mapData[randomX][randomY] = fruits[MathUtils.random(fruits.length - 1)];
     }
 
     public GameObject checkFood(int x, int y) {
         GameObject gameObject = mapData[x][y];
         if (gameObject.isFood()) {
             mapData[x][y] = GameObject.EMPTY_CELL;
-            foodCount--;
+            if (gameObject == GameObject.FOOD) foodCount--;
         }
         return gameObject;
     }

@@ -43,8 +43,8 @@ public class GameScreen implements Screen, GameConstants {
     public void show() {
         this.level = 0;
         //this.difficulty = Difficulty.NEWBIE;
-        this.difficulty = Difficulty.MIDDLE;
-        //this.difficulty = Difficulty.EXPERT;
+        //this.difficulty = Difficulty.MIDDLE;
+        this.difficulty = Difficulty.EXPERT;
         //this.difficulty = Difficulty.NIGHTMARE;
         this.gameMap = new GameMap();
         this.pacMan = new Pacman(gameMap, difficulty);
