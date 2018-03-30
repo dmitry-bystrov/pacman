@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.BufferedReader;
@@ -12,30 +13,47 @@ import java.util.HashMap;
 
 public class GameMap implements GameConstants {
 
-    public static final String MAP_FILE_NAME = "map3.dat";
+    public static final String MAP_FILE_NAME = "map5.dat";
     private GameObject[][] mapData;
-    private HashMap<GameObject, TextureRegion> textures;
+    private HashMap<GameObject, TextureRegion> mapObjectsTextures;
+    private HashMap<Integer, TextureRegion> pipesTextures;
     private HashMap<GameObject, Vector2> startPositions;
 
     private int mapWidht;
     private int mapHeight;
     private int foodCount;
+    private final GameObject fruits[] = {GameObject.APPLE, GameObject.ORANGE, GameObject.BANANA};
+    private final int pipeIndex[] = {1, 10, 11, 100, 101, 110, 111, 1000, 1001, 1010, 1011, 1100, 1101, 1110, 1111};
 
     public GameMap() {
-        this.textures = new HashMap<>();
+        this.mapObjectsTextures = new HashMap<>();
+        this.pipesTextures = new HashMap<>();
         putTexture(GameObject.EMPTY_CELL);
-        putTexture(GameObject.WALL);
         putTexture(GameObject.FOOD);
         putTexture(GameObject.XFOOD);
+        putTexture(GameObject.PIPE);
+        putTexture(GameObject.ORANGE);
+        putTexture(GameObject.APPLE);
+        putTexture(GameObject.BANANA);
         initMap();
     }
 
     private void putTexture(GameObject gameObject) {
-        textures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()));
+        if (gameObject != GameObject.PIPE) {
+            mapObjectsTextures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()));
+        } else {
+            for (int i = 0; i < pipeIndex.length; i++) {
+                pipesTextures.put(pipeIndex[i], Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName(), pipeIndex[i]));
+            }
+        }
     }
 
     private TextureRegion getTexture(GameObject gameObject) {
-        return textures.get(gameObject);
+        return mapObjectsTextures.get(gameObject);
+    }
+
+    private TextureRegion getPipeTexture(int pipeNumber) {
+        return pipesTextures.get(pipeNumber);
     }
 
     public int getFoodCount() {
@@ -90,18 +108,54 @@ public class GameMap implements GameConstants {
     }
 
     public void render(SpriteBatch batch) {
+        int cellX;
+        int cellY;
+        int pipeNumber;
+
         for (int i = 0; i < mapWidht; i++) {
             for (int j = 0; j < mapHeight; j++) {
                 batch.draw(getTexture(GameObject.EMPTY_CELL), i * WORLD_CELL_PX, j * WORLD_CELL_PX);
                 if (mapData[i][j] != GameObject.EMPTY_CELL) {
-                    batch.draw(getTexture(mapData[i][j]), i * WORLD_CELL_PX, j * WORLD_CELL_PX);
+                    if (mapData[i][j] != GameObject.PIPE){
+                        batch.draw(getTexture(mapData[i][j]), i * WORLD_CELL_PX, j * WORLD_CELL_PX);
+                    } else {
+                        pipeNumber = 0;
+                        for (Direction direction:Direction.values()) {
+                            cellX = i + direction.getX();
+                            cellY = j + direction.getY();
+                            if (cellX < 0 || cellY < 0 || cellX >= mapData.length || cellY >= mapData[cellX].length) continue;
+
+                            if (mapData[cellX][cellY] == GameObject.PIPE) {
+                                pipeNumber += direction.getCost();
+                            }
+                        }
+                        if (pipeNumber == 0) pipeNumber = 1111;
+                        batch.draw(getPipeTexture(pipeNumber), i * WORLD_CELL_PX, j * WORLD_CELL_PX);
+                    }
                 }
             }
         }
     }
 
     public boolean isCellEmpty(int cellX, int cellY) {
-        return mapData[cellX][cellY] != GameObject.WALL;
+        return mapData[cellX][cellY] != GameObject.PIPE;
+    }
+
+    public void addFruit() {
+        if (foodCount == 0) return;
+        int randomFood = MathUtils.random(foodCount - 1) + 1;
+        int currentFood = 0;
+
+        for (int i = 0; i < mapData.length; i++) {
+            for (int j = 0; j < mapData[i].length; j++) {
+                if (mapData[i][j].isFood()) {
+                    currentFood++;
+                    if (currentFood == randomFood) {
+                        mapData[i][j] = fruits[MathUtils.random(fruits.length - 1)];
+                    }
+                }
+            }
+        }
     }
 
     public GameObject checkFood(int x, int y) {

@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Ghost extends Creature {
-    private static final int ROUTE_TARGET_CELL = -100;
+    private static final int ROUTE_TARGET_CELL = -5;
     private static final int ROUTE_EMPTY_CELL = -9;
     private static final int ROUTE_WALL_CELL = -1;
 
@@ -53,6 +53,7 @@ public class Ghost extends Creature {
         routingMode = RoutingMode.RANDOM_DIRECTION;
         if (eatable) {
             textureRegions = eatableTextureRegions;
+            routingMode = RoutingMode.RANDOM_DIRECTION;
             currentSpeed = BASE_SPEED * difficulty.getGhostsDeceleration();
         } else {
             textureRegions = originalTextureRegions;
@@ -84,7 +85,8 @@ public class Ghost extends Creature {
 
                 for (Direction direction:Direction.values()) {
                     if (gameMap.isCellEmpty((int)currentMapPosition.x + direction.getX(),(int)currentMapPosition.y + direction.getY())) {
-                        newDirectionDistance = targetPosition.dst(currentWorldPosition.x + direction.getX() * SIZE, currentWorldPosition.y + direction.getX() * SIZE);
+                        newDirectionDistance = targetPosition.dst(currentWorldPosition.x + direction.getX() * SIZE, currentWorldPosition.y + direction.getY() * SIZE);
+
                         if (newDirectionDistance < shortestDistance) {
                             shortestDistance = newDirectionDistance;
                             bestDirection = direction.ordinal();
@@ -127,39 +129,59 @@ public class Ghost extends Creature {
         int startPointY = (int) destinationPoint.y / SIZE;
 
         routeMap[(int)targetPosition.x][(int)targetPosition.y] = ROUTE_TARGET_CELL;
+        if (routeMap[startPointX][startPointY] == ROUTE_TARGET_CELL) return;
         routeMap[startPointX][startPointY] = 0;
 
-        fillRouteMap(startPointX, startPointY, routeMap, 1);
+        fillRouteMap(routeMap, 1);
+
+//        String spaces = "  ";
+//        System.out.println(gameObject.toString() + ": fill route map");
+//        for (int i = 0; i < routeMap[0].length; i++) {
+//            for (int j = 0; j < routeMap.length; j++) {
+//                String v = Integer.toString(routeMap[j][routeMap[0].length - i - 1]);
+//                if (v.equals("-5")) v = "*";
+//                if (v.equals("-1")) v = "#";
+//                if (v.equals("-9")) v = " ";
+//                System.out.print("|" + v + spaces.substring(v.length()));
+//            }
+//            System.out.println("|");
+//        }
+//        System.out.println("Route: " + route.toString());
+//        System.out.println("-------------------------------------------------");
     }
 
     // рекурсивный обход карты для поиска кратчайшего маршрута
-    private boolean fillRouteMap(int cellX, int cellY, int routeMap[][], int step) {
+    private boolean fillRouteMap(int routeMap[][], int step) {
         int x;
         int y;
 
-        for (Direction direction:Direction.values()) {
-            x = cellX + direction.getX();
-            y = cellY + direction.getY();
+        for (int i = 0; i < routeMap.length; i++) {
+            for (int j = 0; j < routeMap[i].length; j++) {
+                if (routeMap[i][j] != step - 1) continue;
 
-            if (x < 0 || y < 0 || x >= routeMap.length || y >= routeMap[x].length) continue;
+                for (Direction direction:Direction.values()) {
+                    x = i + direction.getX();
+                    y = j + direction.getY();
 
-            if (routeMap[x][y] == ROUTE_TARGET_CELL) {
-                fillRouteList(x, y, routeMap, step);
-                return true;
-            }
-            if (routeMap[x][y] == ROUTE_EMPTY_CELL) {
-                if (gameMap.isCellEmpty(x, y)) {
-                    routeMap[x][y] = step;
-                } else {
-                    routeMap[x][y] = ROUTE_WALL_CELL;
-                    continue;
+                    if (x < 0 || y < 0 || x >= routeMap.length || y >= routeMap[x].length) continue;
+
+                    if (routeMap[x][y] == ROUTE_TARGET_CELL) {
+                        fillRouteList(x, y, routeMap, step);
+                        return true;
+                    }
+
+                    if (routeMap[x][y] == ROUTE_EMPTY_CELL) {
+                        if (gameMap.isCellEmpty(x, y)) {
+                            routeMap[x][y] = step;
+                        } else {
+                            routeMap[x][y] = ROUTE_WALL_CELL;
+                        }
+                    }
                 }
-
-                if (fillRouteMap(x, y, routeMap, step + 1)) return true;
             }
         }
 
-        return false;
+        return fillRouteMap(routeMap, step + 1);
     }
 
     // когда маршрут найден - проходим по нему в обратном порядке и заполняем маршрутный лист

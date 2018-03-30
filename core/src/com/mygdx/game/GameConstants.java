@@ -4,6 +4,7 @@ public interface GameConstants {
     int MAX_LIVES = 3;
     int WORLD_CELL_PX = 80;
     float BASE_SPEED = 220;
+    int FRUITS_DROP_FREQUENCY = 10;
 
     int VIEWPORT_WIDTH = 1280;
     int VIEWPORT_HEIGHT = 720;
@@ -25,14 +26,14 @@ public interface GameConstants {
         EXPERT(3, 4, 4, 1.4f, 0.8f, true),
         NIGHTMARE(2, 2, 3, 1.6f, 1.0f, true);
 
-        private int pacmanAttackTimer;
-        private int eatableGhostTimer;
-        private int recoveryTimer;
-        private float ghostsAcceleration;
-        private float ghostsDeceleration;
-        private boolean smartAI;
+        private final float pacmanAttackTimer;
+        private final int eatableGhostTimer;
+        private final int recoveryTimer;
+        private final float ghostsAcceleration;
+        private final float ghostsDeceleration;
+        private final boolean smartAI;
 
-        Difficulty(int pacmanAttackTimer, int eatableGhostTimer, int recoveryTimer, float ghostsAcceleration, float ghostsDeceleration, boolean smartAI) {
+        Difficulty(float pacmanAttackTimer, int eatableGhostTimer, int recoveryTimer, float ghostsAcceleration, float ghostsDeceleration, boolean smartAI) {
             this.pacmanAttackTimer = pacmanAttackTimer;
             this.eatableGhostTimer = eatableGhostTimer;
             this.recoveryTimer = recoveryTimer;
@@ -41,7 +42,7 @@ public interface GameConstants {
             this.smartAI = smartAI;
         }
 
-        public int getPacmanAttackTimer() {
+        public float getPacmanAttackTimer() {
             return pacmanAttackTimer;
         }
 
@@ -67,14 +68,16 @@ public interface GameConstants {
     }
 
     enum Direction {
-        LEFT(-1, 0), RIGHT(1, 0), UP(0, 1), DOWN(0, -1);
+        LEFT(-1, 0, 1), RIGHT(1, 0, 100), UP(0, 1, 10), DOWN(0, -1, 1000);
 
         private final int x;
         private final int y;
+        private final int cost;
 
-        Direction(int x, int y) {
+        Direction(int x, int y, int cost) {
             this.x = x;
             this.y = y;
+            this.cost = cost;
         }
 
         public int getX() {
@@ -83,6 +86,10 @@ public interface GameConstants {
 
         public int getY() {
             return y;
+        }
+
+        public int getCost() {
+            return cost;
         }
 
         public Direction invert() {
@@ -101,11 +108,14 @@ public interface GameConstants {
         PACMAN('s', true, false, 0, "pacman", 0),
         FOOD('_', false, true, 5, "food", 0),
         XFOOD('*', false, true, 100, "xfood", 0),
+        ORANGE('o', false, true, 200, "orange", 0),
+        BANANA('n', false, true, 200, "banana", 0),
+        APPLE('a', false, true, 200, "apple", 0),
         RED_GHOST('r', true, false, 500, "ghosts", 0),
-        GREEN_GHOST('g', true, false, 400, "ghosts", 1),
-        BLUE_GHOST('b', true, false, 300, "ghosts", 2),
-        PURPLE_GHOST('p', true, false, 200, "ghosts", 3),
-        WALL('1', false, false, 0, "wall", 0),
+        GREEN_GHOST('g', true, false, 500, "ghosts", 1),
+        BLUE_GHOST('b', true, false, 500, "ghosts", 2),
+        PURPLE_GHOST('p', true, false, 500, "ghosts", 3),
+        PIPE('1', false, false, 0, "pipe", 0),
         EMPTY_CELL('0', false, false, 0, "ground", 0);
 
         private final char mapSymbol;

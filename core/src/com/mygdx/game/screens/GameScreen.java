@@ -1,9 +1,11 @@
 package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Assets;
@@ -29,6 +31,7 @@ public class GameScreen implements Screen, GameConstants {
     private StringBuilder guiHelper;
     private int level;
     private Difficulty difficulty;
+    private float cameraZoom;
 
     public GameScreen(SpriteBatch batch, Camera camera) {
         this.batch = batch;
@@ -39,10 +42,10 @@ public class GameScreen implements Screen, GameConstants {
     @Override
     public void show() {
         this.level = 0;
-        //difficulty = Difficulty.NEWBIE;
-        //difficulty = Difficulty.MIDDLE;
-        //difficulty = Difficulty.EXPERT;
-        difficulty = Difficulty.NIGHTMARE;
+        //this.difficulty = Difficulty.NEWBIE;
+        this.difficulty = Difficulty.MIDDLE;
+        //this.difficulty = Difficulty.EXPERT;
+        //this.difficulty = Difficulty.NIGHTMARE;
         this.gameMap = new GameMap();
         this.pacMan = new Pacman(gameMap, difficulty);
         this.ghosts = new Ghost[4];
@@ -63,6 +66,7 @@ public class GameScreen implements Screen, GameConstants {
         ghostsEatable = false;
         eatableGhostsTimer = 0;
         packmanAttackTimer = 0;
+        cameraZoom = 1;
         gameMap.initMap();
         pacMan.initPosition();
         for (int i = 0; i < ghosts.length; i++) {
@@ -82,7 +86,7 @@ public class GameScreen implements Screen, GameConstants {
     @Override
     public void render(float delta) {
         update(delta);
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(camera.combined);
 
@@ -109,6 +113,7 @@ public class GameScreen implements Screen, GameConstants {
 
     public void resetCamera() {
         camera.position.set(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2, 0);
+        ((OrthographicCamera)camera).zoom = 1;
         camera.update();
     }
 
@@ -172,6 +177,15 @@ public class GameScreen implements Screen, GameConstants {
     }
 
     private void update(float dt) {
+
+        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_9)) {
+            cameraZoom -= 0.4f * dt;
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_6)) {
+            cameraZoom += 0.4f * dt;
+        }
+
         cameraTrackPackman();
         if (Gdx.input.justTouched() && Gdx.input.getY() < 50) {
             ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
@@ -184,8 +198,6 @@ public class GameScreen implements Screen, GameConstants {
             }
             return;
         }
-
-        //if (true) return;
 
         updateContacts(dt);
         updateGhostsTargetCell(dt);
@@ -216,6 +228,8 @@ public class GameScreen implements Screen, GameConstants {
         if (camera.position.y > gameMap.getMapHeight() * WORLD_CELL_PX - ScreenManager.VIEWPORT_HEIGHT / 2) {
             camera.position.y = gameMap.getMapHeight() * WORLD_CELL_PX - ScreenManager.VIEWPORT_HEIGHT / 2;
         }
+
+        ((OrthographicCamera)camera).zoom = cameraZoom;
         camera.update();
     }
 

@@ -35,6 +35,9 @@ public class Pacman extends Creature {
 
     public void eatObject(GameObject gameObject) {
         eatenObjects.put(gameObject, eatenObjects.get(gameObject) + 1);
+        if (gameObject == GameObject.FOOD && eatenObjects.get(gameObject) % FRUITS_DROP_FREQUENCY == 0) {
+            gameMap.addFruit();
+        }
         score += gameObject.getScore();
     }
 
