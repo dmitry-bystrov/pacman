@@ -13,6 +13,7 @@ public class Ghost extends Creature {
     private static final int ROUTE_TARGET_CELL = -5;
     private static final int ROUTE_EMPTY_CELL = -9;
     private static final int ROUTE_WALL_CELL = -1;
+    public static final int MAX_ROUTE_STEP_COUNT = 50;
 
     enum RoutingMode { RANDOM_DIRECTION, SIMPLE_ROUTING, SMART_ROUTING }
 
@@ -132,7 +133,7 @@ public class Ghost extends Creature {
         if (routeMap[startPointX][startPointY] == ROUTE_TARGET_CELL) return;
         routeMap[startPointX][startPointY] = 0;
 
-        fillRouteMap(routeMap, 1);
+        fillRouteMap(routeMap);
 
 //        String spaces = "  ";
 //        System.out.println(gameObject.toString() + ": fill route map");
@@ -150,38 +151,38 @@ public class Ghost extends Creature {
 //        System.out.println("-------------------------------------------------");
     }
 
-    // рекурсивный обход карты для поиска кратчайшего маршрута
-    private boolean fillRouteMap(int routeMap[][], int step) {
+    // обход карты для поиска кратчайшего маршрута
+    private void fillRouteMap(int routeMap[][]) {
         int x;
         int y;
 
-        for (int i = 0; i < routeMap.length; i++) {
-            for (int j = 0; j < routeMap[i].length; j++) {
-                if (routeMap[i][j] != step - 1) continue;
+        for (int step = 1; step < MAX_ROUTE_STEP_COUNT; step++) {
+            for (int i = 0; i < routeMap.length; i++) {
+                for (int j = 0; j < routeMap[i].length; j++) {
+                    if (routeMap[i][j] != step - 1) continue;
 
-                for (Direction direction:Direction.values()) {
-                    x = i + direction.getX();
-                    y = j + direction.getY();
+                    for (Direction direction : Direction.values()) {
+                        x = i + direction.getX();
+                        y = j + direction.getY();
 
-                    if (x < 0 || y < 0 || x >= routeMap.length || y >= routeMap[x].length) continue;
+                        if (x < 0 || y < 0 || x >= routeMap.length || y >= routeMap[x].length) continue;
 
-                    if (routeMap[x][y] == ROUTE_TARGET_CELL) {
-                        fillRouteList(x, y, routeMap, step);
-                        return true;
-                    }
+                        if (routeMap[x][y] == ROUTE_TARGET_CELL) {
+                            fillRouteList(x, y, routeMap, step);
+                            return;
+                        }
 
-                    if (routeMap[x][y] == ROUTE_EMPTY_CELL) {
-                        if (gameMap.isCellEmpty(x, y)) {
-                            routeMap[x][y] = step;
-                        } else {
-                            routeMap[x][y] = ROUTE_WALL_CELL;
+                        if (routeMap[x][y] == ROUTE_EMPTY_CELL) {
+                            if (gameMap.isCellEmpty(x, y)) {
+                                routeMap[x][y] = step;
+                            } else {
+                                routeMap[x][y] = ROUTE_WALL_CELL;
+                            }
                         }
                     }
                 }
             }
         }
-
-        return fillRouteMap(routeMap, step + 1);
     }
 
     // когда маршрут найден - проходим по нему в обратном порядке и заполняем маршрутный лист
