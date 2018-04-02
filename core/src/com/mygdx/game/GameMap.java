@@ -138,6 +138,7 @@ public class GameMap implements GameConstants {
     }
 
     public boolean isCellEmpty(int cellX, int cellY) {
+        if (cellX < 0 || cellY < 0 || cellX >= mapData.length || cellY >= mapData[cellX].length) return false;
         return mapData[cellX][cellY] != GameObject.PIPE;
     }
 

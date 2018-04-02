@@ -42,7 +42,7 @@ public class ScreenManager implements GameConstants {
         this.viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
         this.gameScreen = new GameScreen(batch, camera);
         this.menuScreen = new MenuScreen(batch);
-        this.gameOverScreen = new GameOverScreen(batch);
+        this.gameOverScreen = new GameOverScreen(batch, camera);
         this.loadingScreen = new LoadingScreen(batch);
     }
 

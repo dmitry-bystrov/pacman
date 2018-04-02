@@ -85,7 +85,10 @@ public class Pacman extends Creature {
     }
 
     private void updateDirection(Direction d) {
-        if (gameMap.isCellEmpty((int)currentMapPosition.x + d.getX(),(int)currentMapPosition.y + d.getY())) {
+        int x = (int)currentMapPosition.x + d.getX();
+        int y = (int)currentMapPosition.y + d.getY();
+
+        if (gameMap.isCellEmpty(x,y) || (x < 0 || x >= gameMap.getMapWidht())) {
             directionVector.x = d.getX();
             directionVector.y = d.getY();
         }

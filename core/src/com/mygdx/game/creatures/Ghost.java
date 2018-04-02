@@ -41,6 +41,8 @@ public class Ghost extends Creature {
     // когда призрак получает координаты ячейки, в которую он должен перейти,
     // выбираем алгоритм поиска пути в зависимости от настроек уровня сложности
     public void setTargetCell(Vector2 targetCell) {
+        if (targetCell.x < 0 || targetCell.x >= gameMap.getMapWidht()) return;
+
         if (difficulty.isSmartAI()) {
             findRouteToTargetCell(targetCell);
             routingMode = RoutingMode.SMART_ROUTING;

@@ -127,8 +127,8 @@ public abstract class Creature implements GameConstants {
         {
             getDirection();
             if (directionVector.len() != 0) {
-                destinationPoint.x += WORLD_CELL_PX * directionVector.x;
-                destinationPoint.y += WORLD_CELL_PX * directionVector.y;
+                destinationPoint.x += SIZE * directionVector.x;
+                destinationPoint.y += SIZE * directionVector.y;
                 updateRotation();
                 action = Action.MOVING;
                 updateVelocity();
@@ -143,7 +143,14 @@ public abstract class Creature implements GameConstants {
                 currentWorldPosition.y = destinationPoint.y;
                 currentMapPosition.x = (int) currentWorldPosition.x / SIZE;
                 currentMapPosition.y = (int) currentWorldPosition.y / SIZE;
-                action = Action.WAITING;
+
+                if (currentMapPosition.x == -1 || currentMapPosition.x == gameMap.getMapWidht()) {
+                    currentMapPosition.x = (gameMap.getMapWidht() - currentMapPosition.x) - 1;
+                    currentWorldPosition.x = currentMapPosition.x * SIZE;
+                    destinationPoint.x = currentWorldPosition.x + SIZE * directionVector.x;
+                } else {
+                    action = Action.WAITING;
+                }
             }
         }
     }

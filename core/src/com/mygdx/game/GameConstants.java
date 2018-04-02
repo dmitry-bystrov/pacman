@@ -1,7 +1,7 @@
 package com.mygdx.game;
 
 public interface GameConstants {
-    int MAX_LIVES = 3;
+    int MAX_LIVES = 1;
     int WORLD_CELL_PX = 80;
     float BASE_SPEED = 220;
     int FRUITS_DROP_FREQUENCY = 10;
