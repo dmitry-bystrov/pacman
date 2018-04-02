@@ -19,7 +19,7 @@ public class HighScoreSystem {
         try {
             writer = Gdx.files.local(TOP_SCORE_FILE_NAME).writer(false);
             for (int i = 0; i < topPlayers.size(); i++) {
-                writer.write(topPlayers.get(i).replace(' ', '_') + ONE_SPACE + topScores.get(i));
+                writer.write(topPlayers.get(i).replace(' ', '^') + ONE_SPACE + topScores.get(i));
                 writer.write("\n");
             }
         } catch (IOException e) {
@@ -46,7 +46,7 @@ public class HighScoreSystem {
                 while ((line = br.readLine()) != null) {
                     String[] values = line.split("\\s");
                     try {
-                        topPlayers.add(values[0].replace('_', ' '));
+                        topPlayers.add(values[0].replace('^', ' '));
                         topScores.add(Integer.valueOf(values[1]));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
