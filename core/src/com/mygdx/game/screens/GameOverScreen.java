@@ -292,10 +292,6 @@ public class GameOverScreen implements Screen, GameConstants {
         stage.addActor(field);
         stage.addActor(btnSaveResults);
 
-        System.out.println(topScores.getLast());
-        System.out.println(totalScore);
-        System.out.println(topScores.getLast() >= totalScore);
-
         int playerScores = 0;
         for (Map.Entry<GameObject, Integer> entry : gameStats.entrySet()) {
             playerScores += entry.getKey().getScore() * entry.getValue();
@@ -326,9 +322,6 @@ public class GameOverScreen implements Screen, GameConstants {
 
                 String playerName = field.getText();
 
-                System.out.println(topPlayers.toString());
-                System.out.println(topScores.toString());
-
                 if (playerName.length() > MAX_PLAYER_NAME_LENGTH) {
                     playerName = playerName.substring(0, MAX_PLAYER_NAME_LENGTH);
                 }
@@ -347,9 +340,6 @@ public class GameOverScreen implements Screen, GameConstants {
                 }
 
                 HighScoreSystem.saveResult(topPlayers, topScores);
-
-                System.out.println(topPlayers.toString());
-                System.out.println(topScores.toString());
 
                 btnSaveResults.setVisible(false);
                 field.setVisible(false);
