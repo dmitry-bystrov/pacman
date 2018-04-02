@@ -28,7 +28,10 @@ public class GameOverScreen implements Screen, GameConstants {
     private static final int MAX_STATS_COUNT = 9;
     private static final float SCORE_DELAY = 0.05f;
     private static final int SECOND_SCREEN_Y0 = 0 - VIEWPORT_HEIGHT;
-    private static final int CAMERA_SPEED = 200;
+    private static final int CAMERA_SPEED = 250;
+    public static final int TOP_LIST_SIZE = 10;
+    public static final String TWENTY_FIVE_DOTS = ".........................";
+    public static final int MAX_PLAYER_NAME_LENGTH = 25;
 
     private SpriteBatch batch;
     private Stage stage;
@@ -55,8 +58,8 @@ public class GameOverScreen implements Screen, GameConstants {
     private Vector2 cameraSpeed;
     private boolean moveCamera;
 
-    List<String> topScore;
-
+    LinkedList<String> topPlayers;
+    LinkedList<Integer> topScores;
 
     public GameOverScreen(SpriteBatch batch, Camera camera) {
         this.batch = batch;
@@ -68,7 +71,8 @@ public class GameOverScreen implements Screen, GameConstants {
         this.currentCameraPosition = firstCameraPosition.cpy();
         this.secondCameraPosition = new Vector2(VIEWPORT_WIDTH / 2, SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT / 2);
         this.cameraSpeed = new Vector2(0, -1 * CAMERA_SPEED);
-        this.topScore = new LinkedList<>();
+        this.topPlayers = new LinkedList<>();
+        this.topScores = new LinkedList<>();
     }
 
     @Override
@@ -87,7 +91,7 @@ public class GameOverScreen implements Screen, GameConstants {
             putTexture(entry.getKey());
         }
         putTexture(GameObject.EMPTY_CELL);
-        loadTopScore();
+        loadTopScores();
         createGUI();
 
         this.maxLevel = 0;
@@ -99,8 +103,8 @@ public class GameOverScreen implements Screen, GameConstants {
         this.totalScoreToDraw = 0;
     }
 
-    private void loadTopScore() {
-        HighScoreSystem.loadResult(topScore);
+    private void loadTopScores() {
+        HighScoreSystem.loadResult(topPlayers, topScores);
     }
 
     public void setMaxLevel(int maxLevel) {
@@ -208,15 +212,32 @@ public class GameOverScreen implements Screen, GameConstants {
     }
 
     private void drawTopPlayersList() {
-        HighScoreSystem.loadResult(topScore);
-
         font48.draw(batch, "Top Players", 0, SECOND_SCREEN_Y0 + 670, VIEWPORT_WIDTH, 1, false);
         guiHelper.setLength(0);
-        for (int i = 0; i < topScore.size(); i++) {
-            guiHelper.append(i).append(": ").append(topScore.get(i)).append("\n");
+        for (int i = 0; i < TOP_LIST_SIZE; i++) {
+            guiHelper.append(i + 1).append(":\n");
         }
+        font32.draw(batch, guiHelper, 400, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH, -1, false);
 
-        font32.draw(batch, guiHelper, 0, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH, 1, false);
+        guiHelper.setLength(0);
+        for (int i = 0; i < TOP_LIST_SIZE; i++) {
+            if (i > topPlayers.size() - 1) {
+                guiHelper.append(TWENTY_FIVE_DOTS).append("\n");
+            } else {
+                guiHelper.append(topPlayers.get(i)).append("\n");
+            }
+        }
+        font32.draw(batch, guiHelper, 420, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH, 0, false);
+
+        guiHelper.setLength(0);
+        for (int i = 0; i < TOP_LIST_SIZE; i++) {
+            if (i > topScores.size() - 1) {
+                guiHelper.append("0\n");
+            } else {
+                guiHelper.append(topScores.get(i)).append("\n");
+            }
+        }
+        font32.draw(batch, guiHelper, 600, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH, 0, false);
     }
 
     @Override
@@ -274,6 +295,11 @@ public class GameOverScreen implements Screen, GameConstants {
         stage.addActor(field);
         stage.addActor(btnSaveResults);
 
+        if (topScores.get(topScores.size() - 1) >= totalScore) {
+            btnSaveResults.setVisible(false);
+            field.setVisible(false);
+        }
+
         btnNewGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -291,8 +317,27 @@ public class GameOverScreen implements Screen, GameConstants {
         btnSaveResults.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                topScore.add(field.getText() + " " + totalScore);
-                HighScoreSystem.saveResult(topScore);
+
+                int position = -1;
+                String playerName = field.getText();
+
+                if (playerName.length() > MAX_PLAYER_NAME_LENGTH) {
+                    playerName = playerName.substring(0, MAX_PLAYER_NAME_LENGTH - 1);
+                }
+
+                for (int i = 0; i < topScores.size(); i++) {
+                    if (topScores.get(i) < totalScore) {
+                        topScores.add(i, totalScore);
+                        topPlayers.add(i, playerName);
+                    }
+                }
+
+                if (topScores.size() > TOP_LIST_SIZE) {
+                    topScores.remove(topScores.size() - 1);
+                    topPlayers.remove(topPlayers.size() - 1);
+                }
+
+                HighScoreSystem.saveResult(topPlayers, topScores);
 
                 btnSaveResults.setVisible(false);
                 field.setVisible(false);
