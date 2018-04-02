@@ -58,8 +58,8 @@ public class GameOverScreen implements Screen, GameConstants {
     private Vector2 cameraSpeed;
     private boolean moveCamera;
 
-    LinkedList<String> topPlayers;
-    LinkedList<Integer> topScores;
+    private LinkedList<String> topPlayers;
+    private LinkedList<Integer> topScores;
 
     public GameOverScreen(SpriteBatch batch, Camera camera) {
         this.batch = batch;
@@ -217,7 +217,7 @@ public class GameOverScreen implements Screen, GameConstants {
         for (int i = 0; i < TOP_LIST_SIZE; i++) {
             guiHelper.append(i + 1).append(":\n");
         }
-        font32.draw(batch, guiHelper, 400, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH, -1, false);
+        font32.draw(batch, guiHelper, 400, SECOND_SCREEN_Y0 + 600, 20, -1, false);
 
         guiHelper.setLength(0);
         for (int i = 0; i < TOP_LIST_SIZE; i++) {
@@ -227,7 +227,7 @@ public class GameOverScreen implements Screen, GameConstants {
                 guiHelper.append(topPlayers.get(i)).append("\n");
             }
         }
-        font32.draw(batch, guiHelper, 420, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH, 0, false);
+        font32.draw(batch, guiHelper, 420, SECOND_SCREEN_Y0 + 600, 180, 0, false);
 
         guiHelper.setLength(0);
         for (int i = 0; i < TOP_LIST_SIZE; i++) {
