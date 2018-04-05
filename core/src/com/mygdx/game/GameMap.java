@@ -48,6 +48,10 @@ public class GameMap implements GameConstants {
         }
     }
 
+    public boolean isOutOfBounds(int x, int y) {
+        return (x < 0 || x >= mapWidht || y < 0 || y >= mapHeight);
+    }
+
     private TextureRegion getTexture(GameObject gameObject) {
         return mapObjectsTextures.get(gameObject);
     }
