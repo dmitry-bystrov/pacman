@@ -26,12 +26,9 @@ import java.util.*;
 public class GameOverScreen implements Screen, GameConstants {
     private static final float STATS_DELAY = 0.75f;
     private static final int MAX_STATS_COUNT = 9;
-    private static final float SCORE_DELAY = 0.05f;
+    private static final float SCORE_DELAY = 0.025f;
     private static final int SECOND_SCREEN_Y0 = 0 - VIEWPORT_HEIGHT;
-    private static final int CAMERA_SPEED = 250;
-    private static final int TOP_LIST_SIZE = 10;
-    private static final String TWENTY_DASHES = "__________________";
-    private static final int MAX_PLAYER_NAME_LENGTH = 20;
+    private static final int CAMERA_SPEED = 300;
 
     private SpriteBatch batch;
     private Stage stage;
@@ -40,7 +37,7 @@ public class GameOverScreen implements Screen, GameConstants {
     private BitmapFont font32;
     private BitmapFont font48;
     private BitmapFont font96;
-    private int maxLevel;
+
     private StringBuilder guiHelper;
     private HashMap<GameObject, TextureRegion[]> textures;
     private LinkedHashMap<GameObject, Integer> gameStats;
@@ -58,9 +55,6 @@ public class GameOverScreen implements Screen, GameConstants {
     private Vector2 cameraSpeed;
     private boolean moveCamera;
 
-    private LinkedList<String> topPlayers;
-    private LinkedList<Integer> topScores;
-
     public GameOverScreen(SpriteBatch batch, Camera camera) {
         this.batch = batch;
         this.camera = camera;
@@ -71,8 +65,6 @@ public class GameOverScreen implements Screen, GameConstants {
         this.currentCameraPosition = firstCameraPosition.cpy();
         this.secondCameraPosition = new Vector2(VIEWPORT_WIDTH / 2, SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT / 2);
         this.cameraSpeed = new Vector2(0, -1 * CAMERA_SPEED);
-        this.topPlayers = new LinkedList<>();
-        this.topScores = new LinkedList<>();
     }
 
     @Override
@@ -85,16 +77,16 @@ public class GameOverScreen implements Screen, GameConstants {
         font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf", BitmapFont.class);
         font96 = Assets.getInstance().getAssetManager().get("zorque96.ttf", BitmapFont.class);
 
-        Iterator<Map.Entry<GameObject, Integer>> iter = gameStats.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<GameObject, Integer> entry = iter.next();
+        for (Map.Entry<GameObject, Integer> entry : gameStats.entrySet()) {
             putTexture(entry.getKey());
         }
+
         putTexture(GameObject.EMPTY_CELL);
+        putTexture(GameObject.PIPE);
+
         loadTopScores();
         createGUI();
 
-        this.maxLevel = 0;
         this.statsDelay = 0;
         this.scoreDelay = 0;
         this.statsCount = 0;
@@ -104,16 +96,7 @@ public class GameOverScreen implements Screen, GameConstants {
     }
 
     private void loadTopScores() {
-        HighScoreSystem.loadResult(topPlayers, topScores);
-
-        for (int i = topPlayers.size() - 1; i < TOP_LIST_SIZE; i++) {
-            topPlayers.add(TWENTY_DASHES);
-            topScores.add(0);
-        }
-    }
-
-    public void setMaxLevel(int maxLevel) {
-        this.maxLevel = maxLevel;
+        HighScoreSystem.loadResult();
     }
 
     public void setGameStats(LinkedHashMap<GameObject, Integer> gameStats) {
@@ -122,7 +105,13 @@ public class GameOverScreen implements Screen, GameConstants {
     }
 
     private void putTexture(GameObject gameObject) {
-        textures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split(WORLD_CELL_PX, WORLD_CELL_PX)[gameObject.getTextureRegionIndex()]);
+        int textureIndex = -1;
+
+        if (gameObject == GameObject.PIPE) {
+            textureIndex = 1010;
+        }
+
+        textures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName(), textureIndex).split(WORLD_CELL_PX, WORLD_CELL_PX)[gameObject.getTextureRegionIndex()]);
     }
 
     private TextureRegion[] getTexture(GameObject gameObject) {
@@ -133,6 +122,9 @@ public class GameOverScreen implements Screen, GameConstants {
         for (int x = 0; x <= VIEWPORT_WIDTH - WORLD_CELL_PX; x += WORLD_CELL_PX) {
             for (int y = SECOND_SCREEN_Y0; y <= VIEWPORT_HEIGHT - WORLD_CELL_PX; y += WORLD_CELL_PX) {
                 batch.draw(getTexture(GameObject.EMPTY_CELL)[0], x, y, WORLD_CELL_PX / 2, WORLD_CELL_PX / 2, WORLD_CELL_PX, WORLD_CELL_PX,1,1,0);
+                if (x == 0 || x == VIEWPORT_WIDTH - WORLD_CELL_PX) {
+                    batch.draw(getTexture(GameObject.PIPE)[0], x, y, WORLD_CELL_PX / 2, WORLD_CELL_PX / 2, WORLD_CELL_PX, WORLD_CELL_PX,1,1,0);
+                }
             }
         }
     }
@@ -202,10 +194,12 @@ public class GameOverScreen implements Screen, GameConstants {
             float imageY = 250 - (yLine * WORLD_CELL_PX + 5);
             float textX = 120 + xLine * 350 + WORLD_CELL_PX + 5;
             float textY = 250 - (yLine * WORLD_CELL_PX + 5) + WORLD_CELL_PX / 2;
+
             batch.draw(getTexture(entry.getKey())[0], imageX, imageY, WORLD_CELL_PX / 2, WORLD_CELL_PX / 2, WORLD_CELL_PX, WORLD_CELL_PX, 1, 1, 0);
             guiHelper.setLength(0);
             guiHelper.append(": ").append(entry.getValue()).append("x").append(entry.getKey().getScore());
             font48.draw(batch, guiHelper, textX, textY, 0, -1, false);
+
             xLine++;
             if (xLine == 3) {
                 xLine = 0;
@@ -213,28 +207,10 @@ public class GameOverScreen implements Screen, GameConstants {
             }
         }
 
-        drawTopPlayersList();
-    }
-
-    private void drawTopPlayersList() {
         font48.draw(batch, "Top Players", 0, SECOND_SCREEN_Y0 + 670, VIEWPORT_WIDTH, 1, false);
-        guiHelper.setLength(0);
-        for (int i = 0; i < TOP_LIST_SIZE; i++) {
-            guiHelper.append(i + 1).append(":\n");
-        }
-        font32.draw(batch, guiHelper, 360, SECOND_SCREEN_Y0 + 600, 40, 0, false);
-
-        guiHelper.setLength(0);
-        for (int i = 0; i < TOP_LIST_SIZE; i++) {
-            guiHelper.append(topPlayers.get(i)).append("\n");
-        }
-        font32.draw(batch, guiHelper, 420, SECOND_SCREEN_Y0 + 600, 440, -1, false);
-
-        guiHelper.setLength(0);
-        for (int i = 0; i < TOP_LIST_SIZE; i++) {
-            guiHelper.append(topScores.get(i)).append("\n");
-        }
-        font32.draw(batch, guiHelper, 860, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH - 860, -1, false);
+        font32.draw(batch, HighScoreSystem.getListNumbersColumn(), 360, SECOND_SCREEN_Y0 + 600, 40, 0, false);
+        font32.draw(batch, HighScoreSystem.getListPlayersColumn(), 420, SECOND_SCREEN_Y0 + 600, 440, -1, false);
+        font32.draw(batch, HighScoreSystem.getListScoresColumn(), 860, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH - 860, -1, false);
     }
 
     @Override
@@ -297,7 +273,7 @@ public class GameOverScreen implements Screen, GameConstants {
             playerScores += entry.getKey().getScore() * entry.getValue();
         }
 
-        if (topScores.getLast() >= playerScores) {
+        if (HighScoreSystem.getMinScore() >= playerScores) {
             btnSaveResults.setVisible(false);
             field.setVisible(false);
         }
@@ -319,27 +295,7 @@ public class GameOverScreen implements Screen, GameConstants {
         btnSaveResults.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
-                String playerName = field.getText();
-
-                if (playerName.length() > MAX_PLAYER_NAME_LENGTH) {
-                    playerName = playerName.substring(0, MAX_PLAYER_NAME_LENGTH);
-                }
-
-                for (int i = 0; i < topScores.size(); i++) {
-                    if (topScores.get(i) < totalScore) {
-                        topScores.add(i, totalScore);
-                        topPlayers.add(i, playerName);
-                        break;
-                    }
-                }
-
-                if (topScores.size() > TOP_LIST_SIZE) {
-                    topScores.remove(topScores.size() - 1);
-                    topPlayers.remove(topPlayers.size() - 1);
-                }
-
-                HighScoreSystem.saveResult(topPlayers, topScores);
+                HighScoreSystem.saveResult(field.getText(), totalScore);
 
                 btnSaveResults.setVisible(false);
                 field.setVisible(false);

@@ -59,7 +59,6 @@ public class ScreenManager implements GameConstants {
 
     public void changeScreen(ScreenType type) {
         if (type == ScreenType.GAME_OVER) {
-            gameOverScreen.setMaxLevel(gameScreen.getLevel());
             gameOverScreen.setGameStats(gameScreen.getGameStats());
         }
 
