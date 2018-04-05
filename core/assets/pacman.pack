@@ -10,6 +10,13 @@ ghosts
   orig: 160, 400
   offset: 0, 0
   index: -1
+stars
+  rotate: false
+  xy: 164, 2
+  size: 320, 160
+  orig: 320, 160
+  offset: 0, 0
+  index: -1
 pacman
   rotate: false
   xy: 2, 404
@@ -19,168 +26,161 @@ pacman
   index: -1
 simpleButton
   rotate: false
-  xy: 164, 2
+  xy: 164, 164
   size: 320, 80
   orig: 320, 80
   offset: 0, 0
   index: -1
 xfood
   rotate: false
-  xy: 164, 84
-  size: 80, 80
-  orig: 80, 80
-  offset: 0, 0
-  index: -1
-wall
-  rotate: false
-  xy: 164, 166
+  xy: 164, 246
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 shortButton
   rotate: false
-  xy: 164, 248
+  xy: 246, 246
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 pipe
   rotate: false
-  xy: 246, 84
+  xy: 328, 246
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1111
 pipe
   rotate: false
-  xy: 328, 84
+  xy: 410, 246
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1110
 pipe
   rotate: false
-  xy: 410, 84
+  xy: 2, 486
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 111
 pipe
   rotate: false
-  xy: 246, 166
+  xy: 84, 486
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1101
 pipe
   rotate: false
-  xy: 246, 248
+  xy: 166, 486
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1100
 pipe
   rotate: false
-  xy: 328, 166
+  xy: 248, 486
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 110
 pipe
   rotate: false
-  xy: 410, 166
+  xy: 330, 486
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 11
 pipe
   rotate: false
-  xy: 328, 248
+  xy: 412, 486
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1011
 pipe
   rotate: false
-  xy: 410, 248
+  xy: 2, 568
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1010
 pipe
   rotate: false
-  xy: 2, 486
+  xy: 2, 650
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 101
 pipe
   rotate: false
-  xy: 84, 486
+  xy: 2, 732
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1001
 pipe
   rotate: false
-  xy: 166, 486
+  xy: 2, 814
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1000
 pipe
   rotate: false
-  xy: 248, 486
+  xy: 2, 896
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 100
 pipe
   rotate: false
-  xy: 330, 486
+  xy: 84, 568
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 10
 pipe
   rotate: false
-  xy: 412, 486
+  xy: 166, 568
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1
 orange
   rotate: false
-  xy: 2, 568
+  xy: 248, 568
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 ground
   rotate: false
-  xy: 2, 650
+  xy: 330, 568
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 food
   rotate: false
-  xy: 2, 732
+  xy: 412, 568
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 banana
   rotate: false
-  xy: 2, 814
+  xy: 84, 650
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 apple
   rotate: false
-  xy: 2, 896
+  xy: 84, 732
   size: 80, 80
   orig: 80, 80
   offset: 0, 0

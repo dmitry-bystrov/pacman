@@ -14,7 +14,7 @@ public class Ghost extends Creature {
     private static final int ROUTE_EMPTY_CELL = -9;
     private static final int ROUTE_WALL_CELL = -1;
     private static final int MAX_ROUTE_STEP_COUNT = 50;
-    private static final int ROUND_UP_DISTANCE = 4;
+    private static final int ROUND_UP_DISTANCE = 5                     ;
 
     enum RoutingMode { RANDOM_DIRECTION, SIMPLE_ROUTING, SMART_ROUTING }
 
@@ -68,7 +68,7 @@ public class Ghost extends Creature {
                 x = targetX + direction.getX() * step;
                 y = targetY + direction.getY() * step;
                 if (gameMap.isOutOfBounds(x + direction.getX(), y + direction.getY())) break;
-            } while(gameMap.isCellEmpty(targetX + direction.getX(), targetY +direction.getY()) && step < ROUND_UP_DISTANCE);
+            } while(gameMap.isCellEmpty(x + direction.getX(), y + direction.getY()) && step < ROUND_UP_DISTANCE);
 
             targetX = x;
             targetY = y;

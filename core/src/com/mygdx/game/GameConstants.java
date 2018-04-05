@@ -116,6 +116,7 @@ public interface GameConstants {
         PURPLE_GHOST('p', true, false, 500, "ghosts", 3),
         ORANGE('o', false, true, 350, "orange", 0),
         PIPE('1', false, false, 0, "pipe", 0),
+        STAR('2', false, false, 0, "stars", 0),
         EMPTY_CELL('0', false, false, 0, "ground", 0);
 
         private final char mapSymbol;

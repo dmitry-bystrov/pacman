@@ -46,6 +46,7 @@ public class GameOverScreen implements Screen, GameConstants {
     private float scoreDelay;
     private int statsCount;
     private int statsCounted;
+    private int starsCount;
     private int totalScore;
     private int totalScoreToDraw;
 
@@ -82,6 +83,7 @@ public class GameOverScreen implements Screen, GameConstants {
         }
 
         putTexture(GameObject.EMPTY_CELL);
+        putTexture(GameObject.STAR);
         putTexture(GameObject.PIPE);
 
         loadTopScores();
@@ -91,6 +93,7 @@ public class GameOverScreen implements Screen, GameConstants {
         this.scoreDelay = 0;
         this.statsCount = 0;
         this.statsCounted = 0;
+        this.starsCount = 0;
         this.totalScore = 0;
         this.totalScoreToDraw = 0;
     }
@@ -106,12 +109,17 @@ public class GameOverScreen implements Screen, GameConstants {
 
     private void putTexture(GameObject gameObject) {
         int textureIndex = -1;
+        int textureSize = 1;
 
         if (gameObject == GameObject.PIPE) {
             textureIndex = 1010;
         }
 
-        textures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName(), textureIndex).split(WORLD_CELL_PX, WORLD_CELL_PX)[gameObject.getTextureRegionIndex()]);
+        if (gameObject == GameObject.STAR) {
+            textureSize = 2;
+        }
+
+        textures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName(), textureIndex).split(WORLD_CELL_PX * textureSize, WORLD_CELL_PX * textureSize)[gameObject.getTextureRegionIndex()]);
     }
 
     private TextureRegion[] getTexture(GameObject gameObject) {
@@ -140,6 +148,9 @@ public class GameOverScreen implements Screen, GameConstants {
                 if (totalScore - totalScoreToDraw > 500) increment = 100;
                 if (totalScore - totalScoreToDraw > 5000) increment = 1000;
                 totalScoreToDraw += increment;
+
+                starsCount = totalScoreToDraw / (gameStats.get(GameObject.FOOD) * GameObject.FOOD.getScore());
+                if (starsCount > 5) starsCount = 5;
             }
         }
 
@@ -176,6 +187,10 @@ public class GameOverScreen implements Screen, GameConstants {
         guiHelper.append("Total score: ").append(totalScoreToDraw);
         font48.draw(batch, guiHelper, 420, 370, 0, -1, false);
 
+        for (int i = 0; i < 5; i++) {
+            batch.draw(getTexture(GameObject.STAR)[(starsCount > i?1:0)], 200 + 180 * i, 420, WORLD_CELL_PX * 2, WORLD_CELL_PX * 2, WORLD_CELL_PX * 2, WORLD_CELL_PX * 2, 1, 1, 0);
+        }
+
         int xLine = 0;
         int yLine = 0;
         int count = 0;
@@ -190,9 +205,9 @@ public class GameOverScreen implements Screen, GameConstants {
                 statsCounted++;
             }
 
-            float imageX = 120 + xLine * 350;
+            float imageX = 140 + xLine * 350;
             float imageY = 250 - (yLine * WORLD_CELL_PX + 5);
-            float textX = 120 + xLine * 350 + WORLD_CELL_PX + 5;
+            float textX = 140 + xLine * 350 + WORLD_CELL_PX + 5;
             float textY = 250 - (yLine * WORLD_CELL_PX + 5) + WORLD_CELL_PX / 2;
 
             batch.draw(getTexture(entry.getKey())[0], imageX, imageY, WORLD_CELL_PX / 2, WORLD_CELL_PX / 2, WORLD_CELL_PX, WORLD_CELL_PX, 1, 1, 0);
@@ -225,7 +240,7 @@ public class GameOverScreen implements Screen, GameConstants {
         stage.draw();
     }
 
-    public void createGUI() {
+    private void createGUI() {
         stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
         Gdx.input.setInputProcessor(stage);
         skin = new Skin();
