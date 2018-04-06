@@ -86,7 +86,7 @@ public class MenuScreen implements Screen, GameConstants {
 
         Button btnNewGame = new TextButton("Start New Game", skin, "simpleSkin");
         Button btnExitGame = new TextButton("Exit Game", skin, "simpleSkin");
-        btnNewGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 180);
+        btnNewGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 170);
         btnExitGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 60);
         stage.addActor(btnNewGame);
         stage.addActor(btnExitGame);

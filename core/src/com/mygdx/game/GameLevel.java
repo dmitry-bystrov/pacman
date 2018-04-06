@@ -5,16 +5,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.creatures.Ghost;
+import com.mygdx.game.creatures.Pacman;
+import com.mygdx.game.screens.ScreenManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GameMap implements GameConstants {
+public class GameLevel implements GameConstants {
 
-    public static final String MAP_FILE_NAME = "original_map.dat";
+    private static final String MAP_FILE_NAME = "original_map.dat";
     private GameObject[][] mapData;
+    private GameObject[][] fruitsMap;
     private HashMap<GameObject, TextureRegion> mapObjectsTextures;
     private HashMap<Integer, TextureRegion> pipesTextures;
     private HashMap<GameObject, Vector2> startPositions;
@@ -25,7 +29,16 @@ public class GameMap implements GameConstants {
     private final GameObject fruits[] = {GameObject.APPLE, GameObject.ORANGE, GameObject.BANANA};
     private final int pipeIndex[] = {1, 10, 11, 100, 101, 110, 111, 1000, 1001, 1010, 1011, 1100, 1101, 1110, 1111};
 
-    public GameMap() {
+    private Pacman pacMan;
+    private Ghost[] ghosts;
+    private Difficulty difficulty;
+    private boolean ghostsEatable;
+    private float eatableGhostsTimer;
+    private float packmanAttackTimer;
+
+
+    public GameLevel(Difficulty difficulty) {
+        this.difficulty = difficulty;
         this.mapObjectsTextures = new HashMap<>();
         this.pipesTextures = new HashMap<>();
         putTexture(GameObject.EMPTY_CELL);
@@ -35,7 +48,29 @@ public class GameMap implements GameConstants {
         putTexture(GameObject.ORANGE);
         putTexture(GameObject.APPLE);
         putTexture(GameObject.BANANA);
+
+        this.pacMan = new Pacman(this, difficulty);
+        this.pacMan.initStats();
+
+        this.ghosts = new Ghost[4];
+        this.ghosts[0] = new Ghost(this, GameObject.RED_GHOST, difficulty);
+        this.ghosts[1] = new Ghost(this, GameObject.GREEN_GHOST, difficulty);
+        this.ghosts[2] = new Ghost(this, GameObject.BLUE_GHOST, difficulty);
+        this.ghosts[3] = new Ghost(this, GameObject.PURPLE_GHOST, difficulty);
+    }
+
+    public void startNewLevel(int level) {
+        ghostsEatable = false;
+        eatableGhostsTimer = 0;
+        packmanAttackTimer = 0;
+
         initMap();
+        pacMan.initPosition();
+        for (int i = 0; i < ghosts.length; i++) {
+            ghosts[i].initPosition();
+            ghosts[i].initRouteMap();
+            ghosts[i].setEatable(ghostsEatable);
+        }
     }
 
     private void putTexture(GameObject gameObject) {
@@ -76,8 +111,14 @@ public class GameMap implements GameConstants {
         return startPositions.get(gameObject);
     }
 
-    public void initMap() {
+    private void initMap() {
         loadMap(MAP_FILE_NAME);
+        fruitsMap = new GameObject[mapWidht][mapHeight];
+        for (int i = 0; i < mapWidht; i++) {
+            for (int j = 0; j < mapHeight; j++) {
+                fruitsMap[i][j] = GameObject.EMPTY_CELL;
+            }
+        }
     }
 
     private void loadMap(String name) {
@@ -119,6 +160,7 @@ public class GameMap implements GameConstants {
         for (int i = 0; i < mapWidht; i++) {
             for (int j = 0; j < mapHeight; j++) {
                 batch.draw(getTexture(GameObject.EMPTY_CELL), i * WORLD_CELL_PX, j * WORLD_CELL_PX);
+
                 if (mapData[i][j] != GameObject.EMPTY_CELL) {
                     if (mapData[i][j] != GameObject.PIPE){
                         batch.draw(getTexture(mapData[i][j]), i * WORLD_CELL_PX, j * WORLD_CELL_PX);
@@ -139,6 +181,11 @@ public class GameMap implements GameConstants {
                 }
             }
         }
+
+        pacMan.render(batch);
+        for (int i = 0; i < ghosts.length; i++) {
+            ghosts[i].render(batch);
+        }
     }
 
     public boolean isCellEmpty(int cellX, int cellY) {
@@ -147,23 +194,107 @@ public class GameMap implements GameConstants {
     }
 
     public void addRandomFruit() {
-        int randomX = 0;
-        int randomY = 0;
+        int cellsCount = 0;
+        for (int i = 0; i < mapWidht; i++) {
+            for (int j = 0; j < mapHeight; j++) {
+                if (fruitsMap[i][j] == GameObject.FOOD) cellsCount++;
+            }
+        }
 
-        do {
-            randomX = MathUtils.random(mapData.length - 1);
-            randomY = MathUtils.random(mapData[randomX].length - 1);
-        } while (mapData[randomX][randomY] != GameObject.EMPTY_CELL);
+        int targetCell = MathUtils.random(cellsCount);
+        for (int i = 0; i < mapWidht; i++) {
+            for (int j = 0; j < mapHeight; j++) {
+                if (fruitsMap[i][j] == GameObject.FOOD) {
+                    if (targetCell == 0) {
+                        mapData[i][j] = fruits[MathUtils.random(fruits.length - 1)];
+                        fruitsMap[i][j] = GameObject.EMPTY_CELL;
+                        return;
+                    }
 
-        mapData[randomX][randomY] = fruits[MathUtils.random(fruits.length - 1)];
+                    targetCell--;
+                }
+            }
+        }
     }
 
     public GameObject checkFood(int x, int y) {
         GameObject gameObject = mapData[x][y];
         if (gameObject.isFood()) {
             mapData[x][y] = GameObject.EMPTY_CELL;
+            fruitsMap[x][y] = GameObject.FOOD;
             if (gameObject == GameObject.FOOD) foodCount--;
         }
         return gameObject;
     }
+
+    public void update(float dt) {
+
+        updateContacts();
+        updateGhostsTargetCell(dt);
+        updatePacmanBeastModeState(dt);
+
+        for (int i = 0; i < ghosts.length; i++) {
+            ghosts[i].update(dt);
+        }
+
+        pacMan.update(dt);
+
+    }
+
+    public Pacman getPacMan() {
+        return pacMan;
+    }
+
+    private void updateGhostsTargetCell(float dt) {
+        packmanAttackTimer += dt;
+        if (packmanAttackTimer >= difficulty.getPacmanAttackTimer()) {
+            for (int i = 0; i < ghosts.length; i++) {
+                if (pacMan.getAction() != Action.RECOVERING) {
+                    ghosts[i].setTargetCell(pacMan.getCurrentMapPosition());
+                } else {
+                    ghosts[i].setTargetCell(getStartPosition(ghosts[i].getGameObject()));
+                }
+            }
+            packmanAttackTimer = 0;
+        }
+    }
+
+    private void updatePacmanBeastModeState(float dt) {
+        if (ghostsEatable) {
+            eatableGhostsTimer -= dt;
+            if (eatableGhostsTimer <= 0) {
+                ghostsEatable = false;
+                for (int i = 0; i < ghosts.length; i++) {
+                    ghosts[i].setEatable(ghostsEatable);
+                }
+            }
+        }
+
+        if (pacMan.getAction() == Action.WAITING) {
+            if (pacMan.checkFoodEating()) {
+                ghostsEatable = true;
+                eatableGhostsTimer = difficulty.getEatableGhostTimer();
+                for (int i = 0; i < ghosts.length; i++) {
+                    ghosts[i].setEatable(ghostsEatable);
+                }
+            }
+        }
+    }
+
+    private void updateContacts() {
+        if (pacMan.getAction() == Action.RECOVERING) return;
+        for (int i = 0; i < ghosts.length; i++) {
+            if (ghosts[i].getAction() == Action.RECOVERING) continue;
+            if (pacMan.getCurrentWorldPosition().dst(ghosts[i].getCurrentWorldPosition()) < pacMan.HALF_SIZE) {
+                if (ghostsEatable) {
+                    pacMan.eatObject(ghosts[i].getGameObject());
+                    ghosts[i].respawn();
+                } else {
+                    pacMan.decreaseLives();
+                    if (pacMan.getLives() > 0) pacMan.respawn();
+                }
+            }
+        }
+    }
+
 }

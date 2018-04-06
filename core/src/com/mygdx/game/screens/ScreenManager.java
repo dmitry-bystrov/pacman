@@ -58,7 +58,7 @@ public class ScreenManager implements GameConstants {
     }
 
     public void changeScreen(ScreenType type) {
-        if (type == ScreenType.GAME_OVER) {
+        if (type == ScreenType.LEVEL_COMPLETE) {
             gameOverScreen.setGameStats(gameScreen.getGameStats());
         }
 
@@ -79,10 +79,10 @@ public class ScreenManager implements GameConstants {
                 targetScreen = gameScreen;
                 Assets.getInstance().loadAssets(ScreenType.GAME);
                 break;
-            case GAME_OVER:
+            case LEVEL_COMPLETE:
                 game.setScreen(loadingScreen);
                 targetScreen = gameOverScreen;
-                Assets.getInstance().loadAssets(ScreenType.GAME_OVER);
+                Assets.getInstance().loadAssets(ScreenType.LEVEL_COMPLETE);
                 break;
         }
     }

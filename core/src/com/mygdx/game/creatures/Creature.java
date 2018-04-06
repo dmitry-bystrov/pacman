@@ -8,14 +8,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
-import com.mygdx.game.GameMap;
+import com.mygdx.game.GameLevel;
 
 public abstract class Creature implements GameConstants {
 
     public final int SIZE = WORLD_CELL_PX;
     public final int HALF_SIZE = WORLD_CELL_PX / 2;
 
-    protected GameMap gameMap;
+    protected GameLevel gameLevel;
     protected GameObject gameObject;
     protected TextureRegion[] textureRegions;
     protected Vector2 currentWorldPosition;
@@ -34,8 +34,8 @@ public abstract class Creature implements GameConstants {
     protected Difficulty difficulty;
 
 
-    public Creature(GameMap gameMap, GameObject gameObject, Difficulty difficulty) {
-        this.gameMap = gameMap;
+    public Creature(GameLevel gameLevel, GameObject gameObject, Difficulty difficulty) {
+        this.gameLevel = gameLevel;
         this.gameObject = gameObject;
         this.difficulty = difficulty;
         this.currentSpeed = BASE_SPEED;
@@ -65,7 +65,7 @@ public abstract class Creature implements GameConstants {
     }
 
     public void initPosition() {
-        currentMapPosition.set(gameMap.getStartPosition(gameObject));
+        currentMapPosition.set(gameLevel.getStartPosition(gameObject));
         currentWorldPosition.set(currentMapPosition).scl(SIZE);
         destinationPoint.set(currentWorldPosition);
         velocityVector.set(0, 0);
@@ -144,8 +144,8 @@ public abstract class Creature implements GameConstants {
                 currentMapPosition.x = (int) currentWorldPosition.x / SIZE;
                 currentMapPosition.y = (int) currentWorldPosition.y / SIZE;
 
-                if (currentMapPosition.x == -1 || currentMapPosition.x == gameMap.getMapWidht()) {
-                    currentMapPosition.x = (gameMap.getMapWidht() - currentMapPosition.x) - 1;
+                if (currentMapPosition.x == -1 || currentMapPosition.x == gameLevel.getMapWidht()) {
+                    currentMapPosition.x = (gameLevel.getMapWidht() - currentMapPosition.x) - 1;
                     currentWorldPosition.x = currentMapPosition.x * SIZE;
                     destinationPoint.x = currentWorldPosition.x + SIZE * directionVector.x;
                 } else {

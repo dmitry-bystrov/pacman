@@ -4,21 +4,13 @@ public interface GameConstants {
     int MAX_LIVES = 1;
     int WORLD_CELL_PX = 80;
     float BASE_SPEED = 220;
-    int FRUITS_DROP_FREQUENCY = 10;
+    int FRUITS_DROP_FREQUENCY = 20;
 
     int VIEWPORT_WIDTH = 1280;
     int VIEWPORT_HEIGHT = 720;
 
-    enum ScreenType { MENU, GAME, GAME_OVER }
+    enum ScreenType { MENU, GAME, LEVEL_COMPLETE}
     enum Action { WAITING, MOVING, DIEING, RECOVERING }
-
-    // перечисление Difficulty описывает уровни сложности игры
-    // pacmanAttackTimer - как часто призраки узнают местоположение пакмана
-    // eatableGhostTimer - как долго длится режим уязвимости призраков
-    // recoveryTimer - как долго длится восстановление призраков после того как их съел пакман
-    // ghostsAcceleration - на сколько быстрее пакмана двигаются призраки
-    // ghostsDeceleration - на сколько медленнее пакмана двигаются призраки в режиме уязвимости
-    // smartAI - уровень интеллекта призраков
 
     enum Difficulty {
         NEWBIE(3.0f, 8, 6, 1.0f, 0.4f, false),
@@ -107,14 +99,14 @@ public interface GameConstants {
     enum GameObject {
         PACMAN('s', true, false, 0, "pacman", 0),
         FOOD('_', false, true, 5, "food", 0),
-        XFOOD('*', false, true, 100, "xfood", 0),
-        BANANA('n', false, true, 350, "banana", 0),
-        RED_GHOST('r', true, false, 500, "ghosts", 0),
-        GREEN_GHOST('g', true, false, 500, "ghosts", 1),
-        APPLE('a', false, true, 350, "apple", 0),
-        BLUE_GHOST('b', true, false, 500, "ghosts", 2),
-        PURPLE_GHOST('p', true, false, 500, "ghosts", 3),
-        ORANGE('o', false, true, 350, "orange", 0),
+        XFOOD('*', false, true, 50, "xfood", 0),
+        BANANA('n', false, true, 200, "banana", 0),
+        RED_GHOST('r', true, false, 100, "ghosts", 0),
+        GREEN_GHOST('g', true, false, 100, "ghosts", 1),
+        APPLE('a', false, true, 200, "apple", 0),
+        BLUE_GHOST('b', true, false, 100, "ghosts", 2),
+        PURPLE_GHOST('p', true, false, 100, "ghosts", 3),
+        ORANGE('o', false, true, 200, "orange", 0),
         PIPE('1', false, false, 0, "pipe", 0),
         STAR('2', false, false, 0, "stars", 0),
         EMPTY_CELL('0', false, false, 0, "ground", 0);

@@ -2,7 +2,7 @@ package com.mygdx.game.creatures;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.mygdx.game.GameMap;
+import com.mygdx.game.GameLevel;
 
 import java.util.LinkedHashMap;
 
@@ -11,8 +11,8 @@ public class Pacman extends Creature {
     private int score;
     private LinkedHashMap<GameObject, Integer> eatenObjects;
 
-    public Pacman(GameMap gameMap, Difficulty difficulty) {
-        super(gameMap, GameObject.PACMAN, difficulty);
+    public Pacman(GameLevel gameLevel, Difficulty difficulty) {
+        super(gameLevel, GameObject.PACMAN, difficulty);
         this.lives = MAX_LIVES;
         this.score = 0;
         this.eatenObjects = new LinkedHashMap<>();
@@ -36,7 +36,7 @@ public class Pacman extends Creature {
     public void eatObject(GameObject gameObject) {
         eatenObjects.put(gameObject, eatenObjects.get(gameObject) + 1);
         if (gameObject == GameObject.FOOD && eatenObjects.get(gameObject) % FRUITS_DROP_FREQUENCY == 0) {
-            gameMap.addRandomFruit();
+            gameLevel.addRandomFruit();
         }
         score += gameObject.getScore();
     }
@@ -50,7 +50,7 @@ public class Pacman extends Creature {
     }
 
     public boolean checkFoodEating() {
-        GameObject uncknownObject = gameMap.checkFood((int)currentMapPosition.x, (int)currentMapPosition.y);
+        GameObject uncknownObject = gameLevel.checkFood((int)currentMapPosition.x, (int)currentMapPosition.y);
         if (uncknownObject.isFood()) {
             eatObject(uncknownObject);
         }
@@ -88,7 +88,7 @@ public class Pacman extends Creature {
         int x = (int)currentMapPosition.x + d.getX();
         int y = (int)currentMapPosition.y + d.getY();
 
-        if (gameMap.isCellEmpty(x,y) || (x < 0 || x >= gameMap.getMapWidht())) {
+        if (gameLevel.isCellEmpty(x,y) || (x < 0 || x >= gameLevel.getMapWidht())) {
             directionVector.x = d.getX();
             directionVector.y = d.getY();
         }
