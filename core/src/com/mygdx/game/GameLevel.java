@@ -7,20 +7,20 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.creatures.Ghost;
 import com.mygdx.game.creatures.Pacman;
-import com.mygdx.game.screens.ScreenManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GameLevel implements GameConstants {
+public class GameLevel implements GameConstants, Serializable {
 
     private static final String MAP_FILE_NAME = "original_map.dat";
     private GameObject[][] mapData;
     private GameObject[][] fruitsMap;
-    private HashMap<GameObject, TextureRegion> mapObjectsTextures;
-    private HashMap<Integer, TextureRegion> pipesTextures;
+    private transient HashMap<GameObject, TextureRegion> mapObjectsTextures;
+    private transient HashMap<Integer, TextureRegion> pipesTextures;
     private HashMap<GameObject, Vector2> startPositions;
 
     private int mapWidht;
@@ -29,8 +29,8 @@ public class GameLevel implements GameConstants {
     private final GameObject fruits[] = {GameObject.APPLE, GameObject.ORANGE, GameObject.BANANA};
     private final int pipeIndex[] = {1, 10, 11, 100, 101, 110, 111, 1000, 1001, 1010, 1011, 1100, 1101, 1110, 1111};
 
-    private Pacman pacMan;
-    private Ghost[] ghosts;
+    private transient Pacman pacMan;
+    private transient Ghost[] ghosts;
     private Difficulty difficulty;
     private boolean ghostsEatable;
     private float eatableGhostsTimer;
@@ -39,15 +39,7 @@ public class GameLevel implements GameConstants {
 
     public GameLevel(Difficulty difficulty) {
         this.difficulty = difficulty;
-        this.mapObjectsTextures = new HashMap<>();
-        this.pipesTextures = new HashMap<>();
-        putTexture(GameObject.EMPTY_CELL);
-        putTexture(GameObject.FOOD);
-        putTexture(GameObject.XFOOD);
-        putTexture(GameObject.PIPE);
-        putTexture(GameObject.ORANGE);
-        putTexture(GameObject.APPLE);
-        putTexture(GameObject.BANANA);
+        this.loadResources();
 
         this.pacMan = new Pacman(this, difficulty);
         this.pacMan.initStats();
@@ -59,18 +51,47 @@ public class GameLevel implements GameConstants {
         this.ghosts[3] = new Ghost(this, GameObject.PURPLE_GHOST, difficulty);
     }
 
+    private void loadResources() {
+        this.mapObjectsTextures = new HashMap<>();
+        this.pipesTextures = new HashMap<>();
+
+        putTexture(GameObject.EMPTY_CELL);
+        putTexture(GameObject.FOOD);
+        putTexture(GameObject.XFOOD);
+        putTexture(GameObject.PIPE);
+        putTexture(GameObject.ORANGE);
+        putTexture(GameObject.APPLE);
+        putTexture(GameObject.BANANA);
+    }
+
     public void startNewLevel(int level) {
         ghostsEatable = false;
         eatableGhostsTimer = 0;
         packmanAttackTimer = 0;
 
         initMap();
+        pacMan.initStats();
         pacMan.initPosition();
         for (int i = 0; i < ghosts.length; i++) {
             ghosts[i].initPosition();
             ghosts[i].initRouteMap();
             ghosts[i].setEatable(ghostsEatable);
         }
+    }
+
+    public void restoreSession(GameSession gs) {
+        this.pacMan = gs.getPacMan();
+        this.ghosts = gs.getGhosts();
+
+        this.loadResources();
+        this.pacMan.loadResources(this);
+        for (int i = 0; i < this.ghosts.length; i++) {
+            this.ghosts[i].loadResources(this);
+        }
+    }
+
+    public Ghost[] getGhosts() {
+        return ghosts;
     }
 
     private void putTexture(GameObject gameObject) {

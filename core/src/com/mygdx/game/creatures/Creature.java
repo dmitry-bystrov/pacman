@@ -10,14 +10,16 @@ import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
 import com.mygdx.game.GameLevel;
 
-public abstract class Creature implements GameConstants {
+import java.io.Serializable;
+
+public abstract class Creature implements GameConstants, Serializable {
 
     public final int SIZE = WORLD_CELL_PX;
     public final int HALF_SIZE = WORLD_CELL_PX / 2;
 
-    protected GameLevel gameLevel;
+    protected transient GameLevel gameLevel;
     protected GameObject gameObject;
-    protected TextureRegion[] textureRegions;
+    protected transient TextureRegion[] textureRegions;
     protected Vector2 currentWorldPosition;
     protected Vector2 currentMapPosition;
     protected Vector2 directionVector;
@@ -35,8 +37,8 @@ public abstract class Creature implements GameConstants {
 
 
     public Creature(GameLevel gameLevel, GameObject gameObject, Difficulty difficulty) {
-        this.gameLevel = gameLevel;
         this.gameObject = gameObject;
+        this.loadResources(gameLevel);
         this.difficulty = difficulty;
         this.currentSpeed = BASE_SPEED;
         this.currentWorldPosition = new Vector2();
@@ -47,7 +49,6 @@ public abstract class Creature implements GameConstants {
         this.animationTimer = 0.0f;
         this.secPerFrame = 0.08f;
         this.recoveryTimer = 0;
-        this.textureRegions = Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split(SIZE, SIZE)[gameObject.getTextureRegionIndex()];
 
         if (healthBarFill == null) {
             Pixmap pixmap = new Pixmap(SIZE, 10, Pixmap.Format.RGBA8888);
@@ -62,6 +63,11 @@ public abstract class Creature implements GameConstants {
             pixmap.drawRectangle(1,1,SIZE - 2,8);
             healthBarBorder = new Texture(pixmap);
         }
+    }
+
+    public void loadResources(GameLevel gameLevel) {
+        this.gameLevel = gameLevel;
+        this.textureRegions = Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split(SIZE, SIZE)[gameObject.getTextureRegionIndex()];
     }
 
     public void initPosition() {

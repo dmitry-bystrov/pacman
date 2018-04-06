@@ -13,15 +13,14 @@ public class Pacman extends Creature {
 
     public Pacman(GameLevel gameLevel, Difficulty difficulty) {
         super(gameLevel, GameObject.PACMAN, difficulty);
-        this.lives = MAX_LIVES;
-        this.score = 0;
         this.eatenObjects = new LinkedHashMap<>();
         initStats();
     }
 
     public void initStats() {
-        score = 0;
-        eatenObjects.clear();
+        this.lives = MAX_LIVES;
+        this.score = 0;
+        this.eatenObjects.clear();
         for (GameObject o:GameObject.values()) {
             if (o.isFood() || o.isCreature() && o != this.gameObject) {
                 eatenObjects.put(o, 0);

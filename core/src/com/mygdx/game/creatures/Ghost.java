@@ -18,8 +18,8 @@ public class Ghost extends Creature {
 
     enum RoutingMode { RANDOM_DIRECTION, SIMPLE_ROUTING, SMART_ROUTING }
 
-    private TextureRegion[] originalTextureRegions;
-    private TextureRegion[] eatableTextureRegions;
+    private transient TextureRegion[] originalTextureRegions;
+    private transient TextureRegion[] eatableTextureRegions;
     private Vector2 targetPosition;
 
     private RoutingMode routingMode;
@@ -29,13 +29,18 @@ public class Ghost extends Creature {
     public Ghost(GameLevel gameLevel, GameObject gameObject, Difficulty difficulty) {
         super(gameLevel, gameObject, difficulty);
 
-        this.originalTextureRegions = textureRegions;
-        this.eatableTextureRegions = Assets.getInstance().getAtlas().findRegion("ghosts").split(SIZE, SIZE)[4];
         this.targetPosition = new Vector2();
         this.secPerFrame = 0.3f;
 
         this.route = new LinkedList<>();
         this.routingMode = RoutingMode.RANDOM_DIRECTION;
+    }
+
+    @Override
+    public void loadResources(GameLevel gameLevel) {
+        super.loadResources(gameLevel);
+        this.originalTextureRegions = textureRegions;
+        this.eatableTextureRegions = Assets.getInstance().getAtlas().findRegion("ghosts").split(SIZE, SIZE)[4];
     }
 
     public void setTargetCell(Vector2 targetCell) {

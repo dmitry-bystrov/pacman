@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.GameConstants;
 import com.mygdx.game.GameLevel;
+import com.mygdx.game.GameSession;
 import com.mygdx.game.creatures.Pacman;
 
 import java.util.LinkedHashMap;
@@ -40,6 +41,7 @@ public class GameScreen implements Screen, GameConstants {
     }
 
     public void restartGameLevel() {
+        this.gameLevel.startNewLevel(levelNumber);
     }
 
     public void setGamePaused(boolean gamePaused) {
@@ -91,6 +93,16 @@ public class GameScreen implements Screen, GameConstants {
             if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_6)) {
                 cameraZoom += 0.4f * dt;
             }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
+                new GameSession(gameLevel).saveSession();
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.F4)) {
+                GameSession gs = new GameSession();
+                gs.loadSession();
+                this.gameLevel = gs.getGameLevel();
+            }
         }
 
         cameraTrackPackman(gameLevel.getPacMan());
@@ -138,7 +150,7 @@ public class GameScreen implements Screen, GameConstants {
 
     @Override
     public void pause() {
-
+        gamePaused = true;
     }
 
     @Override
