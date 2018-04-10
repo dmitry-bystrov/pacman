@@ -96,7 +96,7 @@ public class MenuScreen implements Screen, GameConstants {
         btnNewGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ScreenManager.getInstance().setGameLevel(GameLevel.LEVEL1);
+                ScreenManager.getInstance().setGameLevel(GameLevel.LEVEL6);
                 ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
             }
         });

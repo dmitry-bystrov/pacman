@@ -45,10 +45,10 @@ public interface GameConstants {
     }
 
     enum Difficulty {
-        NEWBIE(3.0f, 8, 6, 1.0f, 0.4f, false),
-        MIDDLE(3.0f, 6, 5, 1.2f, 0.6f, true),
-        EXPERT(2.5f, 4, 4, 1.4f, 0.8f, true),
-        NIGHTMARE(2.0f, 2, 3, 1.6f, 1.0f, true);
+        NEWBIE(2.8f, 8, 6, 1.0f, 0.4f, true),
+        MIDDLE(2.4f, 6, 5, 1.2f, 0.6f, true),
+        EXPERT(2.0f, 4, 4, 1.4f, 0.8f, true),
+        NIGHTMARE(1.6f, 2, 3, 1.6f, 1.0f, true);
 
         private final float pacmanAttackTimer;
         private final int eatableGhostTimer;

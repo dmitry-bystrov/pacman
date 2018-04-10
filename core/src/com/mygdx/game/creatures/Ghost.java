@@ -13,8 +13,8 @@ public class Ghost extends Creature {
     private static final int ROUTE_TARGET_CELL = -5;
     private static final int ROUTE_EMPTY_CELL = -9;
     private static final int ROUTE_WALL_CELL = -1;
-    private static final int MAX_ROUTE_STEP_COUNT = 50;
-    private static final int ROUND_UP_DISTANCE = 6;
+    private static final int MAX_ROUTE_STEP_COUNT = 200;
+    private static final int ROUND_UP_DISTANCE = 5;
 
     enum RoutingMode { RANDOM_DIRECTION, SIMPLE_ROUTING, SMART_ROUTING }
 
@@ -25,9 +25,25 @@ public class Ghost extends Creature {
     private RoutingMode routingMode;
     private List<Direction> route;
     private int routeMap[][];
+    private Direction preferredDirection;
 
     public Ghost(GameManager gameManager, GameObject gameObject, Difficulty difficulty) {
         super(gameManager, gameObject, difficulty);
+
+        switch (gameObject) {
+            case RED_GHOST:
+                preferredDirection = Direction.UP;
+                break;
+            case BLUE_GHOST:
+                preferredDirection = Direction.DOWN;
+                break;
+            case PURPLE_GHOST:
+                preferredDirection = Direction.LEFT;
+                break;
+            case GREEN_GHOST:
+                preferredDirection = Direction.RIGHT;
+                break;
+        }
 
         this.targetPosition = new Vector2();
         this.secPerFrame = 0.3f;
@@ -61,11 +77,11 @@ public class Ghost extends Creature {
 
     private void roundUpTarget(int targetX, int targetY) {
         if (Vector2.dst(currentMapPosition.x, currentMapPosition.y, targetX, targetY) > ROUND_UP_DISTANCE) {
-            Direction direction;
+            Direction direction = preferredDirection;
 
-            do {
+            while (!gameManager.isCellEmpty(targetX + direction.getX(),targetY + direction.getY())) {
                 direction = Direction.values()[MathUtils.random(3)];
-            } while (!gameManager.isCellEmpty(targetX + direction.getX(),targetY + direction.getY()));
+            }
 
             int x;
             int y;
@@ -190,6 +206,8 @@ public class Ghost extends Creature {
                 }
             }
         }
+
+        System.out.println(gameObject.toString() + ": route not found");
     }
 
     private void fillRouteList(int cellX, int cellY, int[][] routeMap, int step) {

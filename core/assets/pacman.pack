@@ -45,9 +45,16 @@ simpleButtonOrange
   orig: 320, 80
   offset: 0, 0
   index: -1
-simpleButton
+simpleButtonGrey
   rotate: false
   xy: 646, 260
+  size: 320, 80
+  orig: 320, 80
+  offset: 0, 0
+  index: -1
+simpleButton
+  rotate: false
+  xy: 164, 342
   size: 320, 80
   orig: 320, 80
   offset: 0, 0
@@ -110,105 +117,105 @@ pipe
   index: 110
 pipe
   rotate: false
-  xy: 164, 342
+  xy: 486, 342
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 11
 pipe
   rotate: false
-  xy: 164, 424
+  xy: 568, 342
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1011
 pipe
   rotate: false
-  xy: 164, 506
+  xy: 650, 342
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1010
 pipe
   rotate: false
-  xy: 164, 588
+  xy: 732, 342
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 101
 pipe
   rotate: false
-  xy: 164, 670
+  xy: 814, 342
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1001
 pipe
   rotate: false
-  xy: 164, 752
+  xy: 896, 342
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1000
 pipe
   rotate: false
-  xy: 164, 834
+  xy: 164, 424
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 100
 pipe
   rotate: false
-  xy: 164, 916
+  xy: 164, 506
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 10
 pipe
   rotate: false
-  xy: 246, 342
+  xy: 164, 588
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: 1
 orange
   rotate: false
-  xy: 246, 424
+  xy: 164, 670
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 ground
   rotate: false
-  xy: 246, 506
+  xy: 164, 752
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 food
   rotate: false
-  xy: 246, 588
+  xy: 164, 834
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 banana
   rotate: false
-  xy: 246, 670
+  xy: 164, 916
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 apple
   rotate: false
-  xy: 246, 752
+  xy: 246, 424
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 heart
   rotate: false
-  xy: 328, 342
+  xy: 328, 424
   size: 120, 60
   orig: 120, 60
   offset: 0, 0
