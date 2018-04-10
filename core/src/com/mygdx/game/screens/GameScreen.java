@@ -7,7 +7,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.GameConstants;
-import com.mygdx.game.GameLevel;
+import com.mygdx.game.GameManager;
 import com.mygdx.game.GameSession;
 import com.mygdx.game.creatures.Pacman;
 
@@ -16,32 +16,31 @@ import java.util.LinkedHashMap;
 public class GameScreen implements Screen, GameConstants {
     private SpriteBatch batch;
     private Camera camera;
-    private GameLevel gameLevel;
+    private GameManager gameManager;
     private SimpleGUI simpleGUI;
     private float cameraZoom;
-    private int levelNumber;
     private boolean gamePaused;
 
     public GameScreen(SpriteBatch batch, Camera camera) {
-        this.levelNumber = 1;
         this.batch = batch;
         this.camera = camera;
     }
 
     @Override
     public void show() {
-        this.gameLevel = new GameLevel(Difficulty.EXPERT);
+        this.gameManager = new GameManager(Difficulty.EXPERT);
+        this.gameManager.setGameLevel(ScreenManager.getInstance().getGameLevel());
         this.simpleGUI = new SimpleGUI(this);
 
         this.cameraZoom = 1;
         this.gamePaused = false;
 
         this.resetCamera();
-        this.gameLevel.startNewLevel(levelNumber);
+        this.gameManager.startNewLevel();
     }
 
     public void restartGameLevel() {
-        this.gameLevel.startNewLevel(levelNumber);
+        this.gameManager.startNewLevel();
     }
 
     public void setGamePaused(boolean gamePaused) {
@@ -52,12 +51,12 @@ public class GameScreen implements Screen, GameConstants {
         return batch;
     }
 
-    public GameLevel getGameLevel() {
-        return gameLevel;
+    public GameManager getGameManager() {
+        return gameManager;
     }
 
     public LinkedHashMap<GameObject, Integer> getGameStats() {
-        return gameLevel.getPacMan().getStats();
+        return gameManager.getPacMan().getStats();
     }
 
     @Override
@@ -68,7 +67,7 @@ public class GameScreen implements Screen, GameConstants {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
-        gameLevel.render(batch);
+        gameManager.render(batch);
 
         resetCamera();
         batch.setProjectionMatrix(camera.combined);
@@ -95,27 +94,29 @@ public class GameScreen implements Screen, GameConstants {
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
-                new GameSession(gameLevel).saveSession();
+                new GameSession(gameManager).saveSession();
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.F4)) {
                 GameSession gs = new GameSession();
-                gs.loadSession();
-                this.gameLevel = gs.getGameLevel();
+                if (gs.loadSession()) {
+                    this.gameManager = gs.getGameManager();
+                    ScreenManager.getInstance().setGameLevel(gameManager.getGameLevel());
+                }
             }
         }
 
-        cameraTrackPackman(gameLevel.getPacMan());
+        cameraTrackPackman(gameManager.getPacMan());
 
         if (!gamePaused) {
-            gameLevel.update(dt);
+            gameManager.update(dt);
 
-            if (gameLevel.getFoodCount() == 0) {
+            if (gameManager.getFoodCount() == 0) {
                 ScreenManager.getInstance().changeScreen(ScreenType.LEVEL_COMPLETE);
             }
         }
 
-        if (gameLevel.getPacMan().getLives() <= 0) {
+        if (gameManager.getPacMan().getLives() <= 0) {
             simpleGUI.showGameOverPanel();
         }
 
@@ -131,11 +132,11 @@ public class GameScreen implements Screen, GameConstants {
         if (camera.position.y < VIEWPORT_HEIGHT / 2) {
             camera.position.y = VIEWPORT_HEIGHT / 2;
         }
-        if (camera.position.x > gameLevel.getMapWidht() * WORLD_CELL_PX - VIEWPORT_WIDTH / 2) {
-            camera.position.x = gameLevel.getMapWidht() * WORLD_CELL_PX - VIEWPORT_WIDTH / 2;
+        if (camera.position.x > gameManager.getMapWidht() * WORLD_CELL_PX - VIEWPORT_WIDTH / 2) {
+            camera.position.x = gameManager.getMapWidht() * WORLD_CELL_PX - VIEWPORT_WIDTH / 2;
         }
-        if (camera.position.y > gameLevel.getMapHeight() * WORLD_CELL_PX - VIEWPORT_HEIGHT / 2) {
-            camera.position.y = gameLevel.getMapHeight() * WORLD_CELL_PX - VIEWPORT_HEIGHT / 2;
+        if (camera.position.y > gameManager.getMapHeight() * WORLD_CELL_PX - VIEWPORT_HEIGHT / 2) {
+            camera.position.y = gameManager.getMapHeight() * WORLD_CELL_PX - VIEWPORT_HEIGHT / 2;
         }
 
         ((OrthographicCamera)camera).zoom = cameraZoom;

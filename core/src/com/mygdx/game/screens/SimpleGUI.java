@@ -182,10 +182,10 @@ public class SimpleGUI implements GameConstants {
 
     public void renderStats() {
         stringBuilder.setLength(0);
-        stringBuilder.append("Score: ").append(gameScreen.getGameLevel().getPacMan().getScore());
+        stringBuilder.append("Score: ").append(gameScreen.getGameManager().getPacMan().getScore());
         font48.draw(gameScreen.getBatch(), stringBuilder, 20, VIEWPORT_HEIGHT - 20);
         for (int i = 0; i < MAX_LIVES; i++) {
-            gameScreen.getBatch().draw(getTexture(GameObject.HEART)[(gameScreen.getGameLevel().getPacMan().getLives() > i?1:0)], VIEWPORT_WIDTH - 80 * (i + 1), VIEWPORT_HEIGHT - 80, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, 1, 1, 0);
+            gameScreen.getBatch().draw(getTexture(GameObject.HEART)[(gameScreen.getGameManager().getPacMan().getLives() > i?1:0)], VIEWPORT_WIDTH - 80 * (i + 1), VIEWPORT_HEIGHT - 80, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, 1, 1, 0);
         }
     }
 

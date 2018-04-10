@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
-import com.mygdx.game.GameLevel;
+import com.mygdx.game.GameManager;
 
 import java.io.Serializable;
 
@@ -17,7 +17,7 @@ public abstract class Creature implements GameConstants, Serializable {
     public final int SIZE = WORLD_CELL_PX;
     public final int HALF_SIZE = WORLD_CELL_PX / 2;
 
-    protected transient GameLevel gameLevel;
+    protected transient GameManager gameManager;
     protected GameObject gameObject;
     protected transient TextureRegion[] textureRegions;
     protected Vector2 currentWorldPosition;
@@ -36,9 +36,9 @@ public abstract class Creature implements GameConstants, Serializable {
     protected Difficulty difficulty;
 
 
-    public Creature(GameLevel gameLevel, GameObject gameObject, Difficulty difficulty) {
+    public Creature(GameManager gameManager, GameObject gameObject, Difficulty difficulty) {
         this.gameObject = gameObject;
-        this.loadResources(gameLevel);
+        this.loadResources(gameManager);
         this.difficulty = difficulty;
         this.currentSpeed = BASE_SPEED;
         this.currentWorldPosition = new Vector2();
@@ -65,13 +65,13 @@ public abstract class Creature implements GameConstants, Serializable {
         }
     }
 
-    public void loadResources(GameLevel gameLevel) {
-        this.gameLevel = gameLevel;
+    public void loadResources(GameManager gameManager) {
+        this.gameManager = gameManager;
         this.textureRegions = Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split(SIZE, SIZE)[gameObject.getTextureRegionIndex()];
     }
 
     public void initPosition() {
-        currentMapPosition.set(gameLevel.getStartPosition(gameObject));
+        currentMapPosition.set(gameManager.getStartPosition(gameObject));
         currentWorldPosition.set(currentMapPosition).scl(SIZE);
         destinationPoint.set(currentWorldPosition);
         velocityVector.set(0, 0);
@@ -150,8 +150,8 @@ public abstract class Creature implements GameConstants, Serializable {
                 currentMapPosition.x = (int) currentWorldPosition.x / SIZE;
                 currentMapPosition.y = (int) currentWorldPosition.y / SIZE;
 
-                if (currentMapPosition.x == -1 || currentMapPosition.x == gameLevel.getMapWidht()) {
-                    currentMapPosition.x = (gameLevel.getMapWidht() - currentMapPosition.x) - 1;
+                if (currentMapPosition.x == -1 || currentMapPosition.x == gameManager.getMapWidht()) {
+                    currentMapPosition.x = (gameManager.getMapWidht() - currentMapPosition.x) - 1;
                     currentWorldPosition.x = currentMapPosition.x * SIZE;
                     destinationPoint.x = currentWorldPosition.x + SIZE * directionVector.x;
                 } else {

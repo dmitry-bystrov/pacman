@@ -99,7 +99,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
     }
 
     private void loadTopScores() {
-        HighScoreSystem.loadResult();
+        HighScoreSystem.loadResult(ScreenManager.getInstance().getGameLevel().getScoreFileName());
     }
 
     public void setGameStats(LinkedHashMap<GameObject, Integer> gameStats) {
@@ -271,14 +271,14 @@ public class LevelComleteScreen implements Screen, GameConstants {
         field.setWidth(560);
         field.setPosition(640 - 560 / 2, SECOND_SCREEN_Y0 + 150);
 
-        Button btnNewGame = new TextButton("Start New Game", skin, "simpleSkin");
+        Button btnNextLevel = new TextButton("Next Level", skin, "simpleSkin");
         Button btnMenu = new TextButton("Return To Menu", skin, "simpleSkin");
         final Button btnSaveResults = new TextButton("OK", skin, "shortButtonStyle");
-        btnNewGame.setPosition(VIEWPORT_WIDTH / 2 - 330, SECOND_SCREEN_Y0 + 30);
+        btnNextLevel.setPosition(VIEWPORT_WIDTH / 2 - 330, SECOND_SCREEN_Y0 + 30);
         btnMenu.setPosition(VIEWPORT_WIDTH / 2 + 10, SECOND_SCREEN_Y0 + 30);
         btnSaveResults.setPosition(640 + 560 / 2 + 40, SECOND_SCREEN_Y0 + 140);
 
-        stage.addActor(btnNewGame);
+        stage.addActor(btnNextLevel);
         stage.addActor(btnMenu);
         stage.addActor(field);
         stage.addActor(btnSaveResults);
@@ -293,9 +293,13 @@ public class LevelComleteScreen implements Screen, GameConstants {
             field.setVisible(false);
         }
 
-        btnNewGame.addListener(new ChangeListener() {
+        btnNextLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                if (ScreenManager.getInstance().getGameLevel().getNext() != null) {
+                    ScreenManager.getInstance().setGameLevel(ScreenManager.getInstance().getGameLevel().getNext());
+                }
+
                 ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
             }
         });
@@ -310,7 +314,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
         btnSaveResults.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                HighScoreSystem.saveResult(field.getText(), totalScore);
+                HighScoreSystem.saveResult(field.getText(), totalScore, starsCount, ScreenManager.getInstance().getGameLevel().getScoreFileName());
 
                 btnSaveResults.setVisible(false);
                 field.setVisible(false);

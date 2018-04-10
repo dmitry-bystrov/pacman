@@ -14,10 +14,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GameLevel implements GameConstants, Serializable {
+public class GameManager implements GameConstants, Serializable {
 
-    //private static final String MAP_FILE_NAME = "original_map.dat";
-    private static final String MAP_FILE_NAME = "map3.dat";
     private GameObject[][] mapData;
     private GameObject[][] fruitsMap;
     private transient HashMap<GameObject, TextureRegion> mapObjectsTextures;
@@ -36,9 +34,9 @@ public class GameLevel implements GameConstants, Serializable {
     private boolean ghostsEatable;
     private float eatableGhostsTimer;
     private float packmanAttackTimer;
+    private GameLevel gameLevel;
 
-
-    public GameLevel(Difficulty difficulty) {
+    public GameManager(Difficulty difficulty) {
         this.difficulty = difficulty;
         this.loadResources();
 
@@ -65,12 +63,12 @@ public class GameLevel implements GameConstants, Serializable {
         putTexture(GameObject.BANANA);
     }
 
-    public void startNewLevel(int level) {
+    public void startNewLevel() {
         ghostsEatable = false;
         eatableGhostsTimer = 0;
         packmanAttackTimer = 0;
 
-        initMap();
+        initMap(gameLevel.getMapFileName());
         pacMan.initStats();
         pacMan.initPosition();
         for (int i = 0; i < ghosts.length; i++) {
@@ -88,7 +86,16 @@ public class GameLevel implements GameConstants, Serializable {
         this.pacMan.loadResources(this);
         for (int i = 0; i < this.ghosts.length; i++) {
             this.ghosts[i].loadResources(this);
+            ghosts[i].setEatable(ghostsEatable);
         }
+    }
+
+    public GameLevel getGameLevel() {
+        return gameLevel;
+    }
+
+    public void setGameLevel(GameLevel gameLevel) {
+        this.gameLevel = gameLevel;
     }
 
     public Ghost[] getGhosts() {
@@ -133,8 +140,8 @@ public class GameLevel implements GameConstants, Serializable {
         return startPositions.get(gameObject);
     }
 
-    private void initMap() {
-        loadMap(MAP_FILE_NAME);
+    private void initMap(String mapFileName) {
+        loadMap(mapFileName);
         fruitsMap = new GameObject[mapWidht][mapHeight];
         for (int i = 0; i < mapWidht; i++) {
             for (int j = 0; j < mapHeight; j++) {

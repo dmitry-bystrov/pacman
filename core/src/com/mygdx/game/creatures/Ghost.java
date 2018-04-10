@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.Assets;
-import com.mygdx.game.GameLevel;
+import com.mygdx.game.GameManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,8 +26,8 @@ public class Ghost extends Creature {
     private List<Direction> route;
     private int routeMap[][];
 
-    public Ghost(GameLevel gameLevel, GameObject gameObject, Difficulty difficulty) {
-        super(gameLevel, gameObject, difficulty);
+    public Ghost(GameManager gameManager, GameObject gameObject, Difficulty difficulty) {
+        super(gameManager, gameObject, difficulty);
 
         this.targetPosition = new Vector2();
         this.secPerFrame = 0.3f;
@@ -37,14 +37,14 @@ public class Ghost extends Creature {
     }
 
     @Override
-    public void loadResources(GameLevel gameLevel) {
-        super.loadResources(gameLevel);
+    public void loadResources(GameManager gameManager) {
+        super.loadResources(gameManager);
         this.originalTextureRegions = textureRegions;
         this.eatableTextureRegions = Assets.getInstance().getAtlas().findRegion("ghosts").split(SIZE, SIZE)[4];
     }
 
     public void setTargetCell(Vector2 targetCell) {
-        if (gameLevel.isOutOfBounds((int)targetCell.x, (int)targetCell.y)) return;
+        if (gameManager.isOutOfBounds((int)targetCell.x, (int)targetCell.y)) return;
 
         if (difficulty.isSmartAI()) {
             roundUpTarget((int)targetCell.x, (int)targetCell.y);
@@ -56,7 +56,7 @@ public class Ghost extends Creature {
     }
 
     public void initRouteMap() {
-        this.routeMap = new int[gameLevel.getMapWidht()][gameLevel.getMapHeight()];
+        this.routeMap = new int[gameManager.getMapWidht()][gameManager.getMapHeight()];
     }
 
     private void roundUpTarget(int targetX, int targetY) {
@@ -65,7 +65,7 @@ public class Ghost extends Creature {
 
             do {
                 direction = Direction.values()[MathUtils.random(3)];
-            } while (!gameLevel.isCellEmpty(targetX + direction.getX(),targetY + direction.getY()));
+            } while (!gameManager.isCellEmpty(targetX + direction.getX(),targetY + direction.getY()));
 
             int x;
             int y;
@@ -75,8 +75,8 @@ public class Ghost extends Creature {
                 step++;
                 x = targetX + direction.getX() * step;
                 y = targetY + direction.getY() * step;
-                if (gameLevel.isOutOfBounds(x + direction.getX(), y + direction.getY())) break;
-            } while(gameLevel.isCellEmpty(x + direction.getX(), y + direction.getY()) && step < ROUND_UP_DISTANCE);
+                if (gameManager.isOutOfBounds(x + direction.getX(), y + direction.getY())) break;
+            } while(gameManager.isCellEmpty(x + direction.getX(), y + direction.getY()) && step < ROUND_UP_DISTANCE);
 
             targetX = x;
             targetY = y;
@@ -109,7 +109,7 @@ public class Ghost extends Creature {
                 int bestDirection = -1;
 
                 for (Direction direction:Direction.values()) {
-                    if (gameLevel.isCellEmpty((int)currentMapPosition.x + direction.getX(),(int)currentMapPosition.y + direction.getY())) {
+                    if (gameManager.isCellEmpty((int)currentMapPosition.x + direction.getX(),(int)currentMapPosition.y + direction.getY())) {
                         newDirectionDistance = targetPosition.dst(currentWorldPosition.x + direction.getX() * SIZE, currentWorldPosition.y + direction.getY() * SIZE);
 
                         if (newDirectionDistance < shortestDistance) {
@@ -180,7 +180,7 @@ public class Ghost extends Creature {
                         }
 
                         if (routeMap[x][y] == ROUTE_EMPTY_CELL) {
-                            if (gameLevel.isCellEmpty(x, y)) {
+                            if (gameManager.isCellEmpty(x, y)) {
                                 routeMap[x][y] = step;
                             } else {
                                 routeMap[x][y] = ROUTE_WALL_CELL;
@@ -218,7 +218,7 @@ public class Ghost extends Creature {
 
         do {
             direction = Direction.values()[MathUtils.random(3)];
-        } while (!gameLevel.isCellEmpty((int)currentMapPosition.x + direction.getX(),(int)currentMapPosition.y + direction.getY()));
+        } while (!gameManager.isCellEmpty((int)currentMapPosition.x + direction.getX(),(int)currentMapPosition.y + direction.getY()));
 
         directionVector.x = direction.getX();
         directionVector.y = direction.getY();

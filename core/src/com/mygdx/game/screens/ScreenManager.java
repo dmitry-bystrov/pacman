@@ -21,6 +21,7 @@ public class ScreenManager implements GameConstants {
     private Screen targetScreen;
     private Viewport viewport;
     private Camera camera;
+    private GameLevel gameLevel;
 
     private static ScreenManager ourInstance = new ScreenManager();
 
@@ -46,6 +47,14 @@ public class ScreenManager implements GameConstants {
         this.loadingScreen = new LoadingScreen(batch);
     }
 
+    public GameLevel getGameLevel() {
+        return gameLevel;
+    }
+
+    public void setGameLevel(GameLevel gameLevel) {
+        this.gameLevel = gameLevel;
+    }
+
     public void resize(int width, int height) {
         viewport.update(width, height);
         viewport.apply();
@@ -68,6 +77,7 @@ public class ScreenManager implements GameConstants {
             screen.dispose();
         }
         resetCamera();
+
         switch (type) {
             case MENU:
                 game.setScreen(loadingScreen);

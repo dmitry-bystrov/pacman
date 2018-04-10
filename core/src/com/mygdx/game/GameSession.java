@@ -12,20 +12,20 @@ import java.io.Serializable;
 public class GameSession implements Serializable {
     private static final String GAME_SESSION_FILE = "game_session.dat";
     private Pacman pacMan;
-    private GameLevel gameLevel;
+    private GameManager gameManager;
     private Ghost[] ghosts;
 
-    public GameLevel getGameLevel() {
-        return gameLevel;
+    public GameManager getGameManager() {
+        return gameManager;
     }
 
     public GameSession() {
     }
 
-    public GameSession(GameLevel gameLevel) {
-        this.gameLevel = gameLevel;
-        this.pacMan = gameLevel.getPacMan();
-        this.ghosts = gameLevel.getGhosts();
+    public GameSession(GameManager gameManager) {
+        this.gameManager = gameManager;
+        this.pacMan = gameManager.getPacMan();
+        this.ghosts = gameManager.getGhosts();
     }
 
     public Pacman getPacMan() {
@@ -40,7 +40,7 @@ public class GameSession implements Serializable {
         ObjectOutputStream out = null;
         try {
             out = new ObjectOutputStream(Gdx.files.local(GAME_SESSION_FILE).write(false));
-            out.writeObject(gameLevel);
+            out.writeObject(gameManager);
             out.writeObject(pacMan);
             for (int i = 0; i < 4; i++) {
                 out.writeObject(ghosts[i]);
@@ -56,17 +56,19 @@ public class GameSession implements Serializable {
         }
     }
 
-    public void loadSession() {
+    public boolean loadSession() {
         ObjectInputStream in = null;
         try {
+            if (!Gdx.files.local(GAME_SESSION_FILE).exists()) return false;
+
             in = new ObjectInputStream(Gdx.files.local(GAME_SESSION_FILE).read());
-            gameLevel = (GameLevel)in.readObject();
+            gameManager = (GameManager)in.readObject();
             pacMan = (Pacman)in.readObject();
             ghosts = new Ghost[4];
             for (int i = 0; i < 4; i++) {
                 ghosts[i] = (Ghost) in.readObject();
             }
-            gameLevel.restoreSession(this);
+            gameManager.restoreSession(this);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -76,6 +78,8 @@ public class GameSession implements Serializable {
                 e.printStackTrace();
             }
         }
+
+        return true;
     }
 }
 

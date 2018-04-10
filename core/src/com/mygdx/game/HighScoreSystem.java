@@ -9,7 +9,6 @@ import java.util.LinkedList;
 
 public class HighScoreSystem {
 
-    private static final String TOP_SCORE_FILE_NAME = "score.dat";
     private static final String ONE_SPACE = " ";
     private static final int TOP_LIST_SIZE = 10;
     private static final String DOTS = ".............................................";
@@ -17,15 +16,17 @@ public class HighScoreSystem {
 
     private static LinkedList<String> topPlayers;
     private static LinkedList<Integer> topScores;
+    private static LinkedList<Integer> topStars;
     private static StringBuilder stringBuilder;
 
     static {
         topPlayers = new LinkedList<>();
         topScores = new LinkedList<>();
+        topStars = new LinkedList<>();
         stringBuilder = new StringBuilder(250);
     }
 
-    public static void saveResult(String player, int score) {
+    public static void saveResult(String player, int score, int stars, String scoreFileName) {
 
         if (player.length() > MAX_PLAYER_NAME_LENGTH) {
             player = player.substring(0, MAX_PLAYER_NAME_LENGTH);
@@ -34,6 +35,7 @@ public class HighScoreSystem {
         for (int i = 0; i < topScores.size(); i++) {
             if (topScores.get(i) < score) {
                 topScores.add(i, score);
+                topStars.add(i, stars);
                 topPlayers.add(i, player);
                 break;
             }
@@ -41,14 +43,15 @@ public class HighScoreSystem {
 
         if (topScores.size() > TOP_LIST_SIZE) {
             topScores.remove(topScores.size() - 1);
+            topStars.remove(topStars.size() - 1);
             topPlayers.remove(topPlayers.size() - 1);
         }
 
         Writer writer = null;
         try {
-            writer = Gdx.files.local(TOP_SCORE_FILE_NAME).writer(false);
+            writer = Gdx.files.local(scoreFileName).writer(false);
             for (int i = 0; i < topPlayers.size(); i++) {
-                writer.write(topPlayers.get(i).replace(' ', '^') + ONE_SPACE + topScores.get(i));
+                writer.write(topPlayers.get(i).replace(' ', '^') + ONE_SPACE + topScores.get(i) + ONE_SPACE + topStars.get(i));
                 writer.write("\n");
             }
         } catch (IOException e) {
@@ -62,14 +65,15 @@ public class HighScoreSystem {
         }
     }
 
-    public static void loadResult() {
+    public static void loadResult(String scoreFileName) {
         topPlayers.clear();
         topScores.clear();
+        topStars.clear();
 
-        if (Gdx.files.local(TOP_SCORE_FILE_NAME).exists()) {
+        if (Gdx.files.local(scoreFileName).exists()) {
             BufferedReader br = null;
             try {
-                br = Gdx.files.local(TOP_SCORE_FILE_NAME).reader(8192);
+                br = Gdx.files.local(scoreFileName).reader(8192);
 
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -77,16 +81,11 @@ public class HighScoreSystem {
                     try {
                         topPlayers.add(values[0].replace('^', ' '));
                         topScores.add(Integer.valueOf(values[1]));
+                        topStars.add(Integer.valueOf(values[2]));
                     } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                         e.printStackTrace();
                     }
                 }
-
-                while (topPlayers.size() < TOP_LIST_SIZE) {
-                    topPlayers.add(DOTS);
-                    topScores.add(0);
-                }
-
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -96,6 +95,12 @@ public class HighScoreSystem {
                     e.printStackTrace();
                 }
             }
+        }
+
+        while (topPlayers.size() < TOP_LIST_SIZE) {
+            topPlayers.add(DOTS);
+            topScores.add(0);
+            topStars.add(0);
         }
     }
 
@@ -126,7 +131,17 @@ public class HighScoreSystem {
         return stringBuilder;
     }
 
+    public static LinkedList<Integer> getTopStars() {
+        return topStars;
+    }
+
+    public static int getMaxStars() {
+        if (topStars.size() == 0) return 0;
+        return topStars.getFirst();
+    }
+
     public static int getMinScore() {
+        if (topScores.size() == 0) return 0;
         return topScores.getLast();
     }
 }

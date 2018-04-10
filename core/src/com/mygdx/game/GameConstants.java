@@ -12,6 +12,38 @@ public interface GameConstants {
     enum ScreenType { MENU, GAME, LEVEL_COMPLETE}
     enum Action { WAITING, MOVING, DIEING, RECOVERING }
 
+    enum GameLevel {
+        LEVEL1("level1.map", "level1.dat"),
+        LEVEL2("level2.map", "level2.dat"),
+        LEVEL3("level3.map", "level3.dat"),
+        LEVEL4("level4.map", "level4.dat"),
+        LEVEL5("level5.map", "level5.dat"),
+        LEVEL6("level6.map", "level6.dat"),
+        LEVEL7("level7.map", "level7.dat"),
+        LEVEL8("level8.map", "level8.dat");
+
+        private final String mapFileName;
+        private final String scoreFileName;
+
+        GameLevel(String mapFileName, String scoreFileName) {
+            this.mapFileName = mapFileName;
+            this.scoreFileName = scoreFileName;
+        }
+
+        public String getMapFileName() {
+            return mapFileName;
+        }
+
+        public String getScoreFileName() {
+            return scoreFileName;
+        }
+
+        public GameLevel getNext() {
+            if (this.ordinal() == GameLevel.values().length - 1) return null;
+            return GameLevel.values()[this.ordinal() + 1];
+        }
+    }
+
     enum Difficulty {
         NEWBIE(3.0f, 8, 6, 1.0f, 0.4f, false),
         MIDDLE(3.0f, 6, 5, 1.2f, 0.6f, true),
