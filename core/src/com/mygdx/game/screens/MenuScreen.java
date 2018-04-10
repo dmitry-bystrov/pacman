@@ -25,6 +25,7 @@ public class MenuScreen implements Screen, GameConstants {
     private Stage stage;
     private Skin skin;
     private BitmapFont font32;
+    private BitmapFont font48;
     private BitmapFont font96;
     private HashMap<GameObject, TextureRegion[]> textures;
 
@@ -36,6 +37,7 @@ public class MenuScreen implements Screen, GameConstants {
     @Override
     public void show() {
         font32 = Assets.getInstance().getAssetManager().get("zorque32.ttf", BitmapFont.class);
+        font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf", BitmapFont.class);
         font96 = Assets.getInstance().getAssetManager().get("zorque96.ttf", BitmapFont.class);
         putTexture(GameObject.EMPTY_CELL);
         createGUI();
@@ -65,6 +67,7 @@ public class MenuScreen implements Screen, GameConstants {
         batch.begin();
         fillBackground();
         font96.draw(batch, "Pac-Man 2018", 0, 600, VIEWPORT_WIDTH, 1, false);
+        font48.draw(batch, "Arcade", 0, 480, VIEWPORT_WIDTH, 1, false);
         batch.end();
         stage.draw();
     }

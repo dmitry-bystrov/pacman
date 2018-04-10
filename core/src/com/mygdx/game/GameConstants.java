@@ -1,7 +1,7 @@
 package com.mygdx.game;
 
 public interface GameConstants {
-    int MAX_LIVES = 1;
+    int MAX_LIVES = 3;
     int WORLD_CELL_PX = 80;
     float BASE_SPEED = 220;
     int FRUITS_DROP_FREQUENCY = 20;
@@ -109,6 +109,7 @@ public interface GameConstants {
         ORANGE('o', false, true, 200, "orange", 0),
         PIPE('1', false, false, 0, "pipe", 0),
         STAR('2', false, false, 0, "stars", 0),
+        HEART('3', false, false, 0, "heart", 0),
         EMPTY_CELL('0', false, false, 0, "ground", 0);
 
         private final char mapSymbol;

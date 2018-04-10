@@ -14,7 +14,7 @@ public class Ghost extends Creature {
     private static final int ROUTE_EMPTY_CELL = -9;
     private static final int ROUTE_WALL_CELL = -1;
     private static final int MAX_ROUTE_STEP_COUNT = 50;
-    private static final int ROUND_UP_DISTANCE = 5                     ;
+    private static final int ROUND_UP_DISTANCE = 6;
 
     enum RoutingMode { RANDOM_DIRECTION, SIMPLE_ROUTING, SMART_ROUTING }
 

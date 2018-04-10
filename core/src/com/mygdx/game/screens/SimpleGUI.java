@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -12,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
+
+import java.util.HashMap;
 
 public class SimpleGUI implements GameConstants {
 
@@ -32,16 +35,33 @@ public class SimpleGUI implements GameConstants {
     private Label pauseLabel;
     private Label gameOverLabel;
     private Image image;
+    private HashMap<GameObject, TextureRegion[]> textures;
 
     public SimpleGUI(GameScreen gameScreen) {
         this.gameScreen = gameScreen;
         this.stringBuilder = new StringBuilder(100);
         this.font32 = Assets.getInstance().getAssetManager().get("zorque32.ttf");
         this.font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf");
+        this.textures = new HashMap<>();
+        this.putTexture(GameObject.HEART);
 
         this.setupSkin();
         this.setupStage();
         this.setupListeners();
+    }
+
+    private void putTexture(GameObject gameObject) {
+        float textureSize = 1;
+
+        if (gameObject == GameObject.HEART) {
+            textureSize = 0.75f;
+        }
+
+        textures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split((int)(WORLD_CELL_PX * textureSize), (int)(WORLD_CELL_PX * textureSize))[gameObject.getTextureRegionIndex()]);
+    }
+
+    private TextureRegion[] getTexture(GameObject gameObject) {
+        return textures.get(gameObject);
     }
 
     private void setupSkin() {
@@ -162,8 +182,11 @@ public class SimpleGUI implements GameConstants {
 
     public void renderStats() {
         stringBuilder.setLength(0);
-        stringBuilder.append("Lives: ").append(gameScreen.getGameLevel().getPacMan().getLives()).append("\nScore: ").append(gameScreen.getGameLevel().getPacMan().getScore());
+        stringBuilder.append("Score: ").append(gameScreen.getGameLevel().getPacMan().getScore());
         font48.draw(gameScreen.getBatch(), stringBuilder, 20, VIEWPORT_HEIGHT - 20);
+        for (int i = 0; i < MAX_LIVES; i++) {
+            gameScreen.getBatch().draw(getTexture(GameObject.HEART)[(gameScreen.getGameLevel().getPacMan().getLives() > i?1:0)], VIEWPORT_WIDTH - 80 * (i + 1), VIEWPORT_HEIGHT - 80, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, 1, 1, 0);
+        }
     }
 
 

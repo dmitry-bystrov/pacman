@@ -38,6 +38,7 @@ public class Assets {
             case MENU:
                 assetManager.load(PACMAN_PACK, TextureAtlas.class);
                 createStandardFont(32);
+                createStandardFont(48);
                 createStandardFont(96);
                 break;
             case GAME:

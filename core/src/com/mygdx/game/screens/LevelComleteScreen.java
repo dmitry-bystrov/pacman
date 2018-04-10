@@ -23,7 +23,7 @@ import com.mygdx.game.HighScoreSystem;
 
 import java.util.*;
 
-public class GameOverScreen implements Screen, GameConstants {
+public class LevelComleteScreen implements Screen, GameConstants {
     private static final float STATS_DELAY = 0.75f;
     private static final int MAX_STATS_COUNT = 9;
     private static final float SCORE_DELAY = 0.025f;
@@ -56,7 +56,7 @@ public class GameOverScreen implements Screen, GameConstants {
     private Vector2 cameraSpeed;
     private boolean moveCamera;
 
-    public GameOverScreen(SpriteBatch batch, Camera camera) {
+    public LevelComleteScreen(SpriteBatch batch, Camera camera) {
         this.batch = batch;
         this.camera = camera;
         this.textures = new HashMap<>();
@@ -182,7 +182,7 @@ public class GameOverScreen implements Screen, GameConstants {
     }
 
     private void drawStats() {
-        font96.draw(batch, "Game Over", 0, 670, VIEWPORT_WIDTH, 1, false);
+        font96.draw(batch, "Level Complete", 0, 670, VIEWPORT_WIDTH, 1, false);
         guiHelper.setLength(0);
         guiHelper.append("Total score: ").append(totalScoreToDraw);
         font48.draw(batch, guiHelper, 420, 370, 0, -1, false);
@@ -222,10 +222,10 @@ public class GameOverScreen implements Screen, GameConstants {
             }
         }
 
-        font48.draw(batch, "Top Players", 0, SECOND_SCREEN_Y0 + 670, VIEWPORT_WIDTH, 1, false);
-        font32.draw(batch, HighScoreSystem.getListNumbersColumn(), 360, SECOND_SCREEN_Y0 + 600, 40, 0, false);
-        font32.draw(batch, HighScoreSystem.getListPlayersColumn(), 420, SECOND_SCREEN_Y0 + 600, 440, -1, false);
-        font32.draw(batch, HighScoreSystem.getListScoresColumn(), 860, SECOND_SCREEN_Y0 + 600, VIEWPORT_WIDTH - 860, -1, false);
+        font48.draw(batch, "Top Players", 0, SECOND_SCREEN_Y0 + 630, VIEWPORT_WIDTH, 1, false);
+        font32.draw(batch, HighScoreSystem.getListNumbersColumn(), 360, SECOND_SCREEN_Y0 + 560, 40, 0, false);
+        font32.draw(batch, HighScoreSystem.getListPlayersColumn(), 420, SECOND_SCREEN_Y0 + 560, 440, -1, false);
+        font32.draw(batch, HighScoreSystem.getListScoresColumn(), 860, SECOND_SCREEN_Y0 + 560, VIEWPORT_WIDTH - 860, -1, false);
     }
 
     @Override

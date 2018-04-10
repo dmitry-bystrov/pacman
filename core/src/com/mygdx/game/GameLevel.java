@@ -16,7 +16,8 @@ import java.util.HashMap;
 
 public class GameLevel implements GameConstants, Serializable {
 
-    private static final String MAP_FILE_NAME = "original_map.dat";
+    //private static final String MAP_FILE_NAME = "original_map.dat";
+    private static final String MAP_FILE_NAME = "map3.dat";
     private GameObject[][] mapData;
     private GameObject[][] fruitsMap;
     private transient HashMap<GameObject, TextureRegion> mapObjectsTextures;
