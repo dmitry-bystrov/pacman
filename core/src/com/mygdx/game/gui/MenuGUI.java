@@ -13,6 +13,7 @@ public class MenuGUI extends SimpleGUI {
     private MenuScreen menuScreen;
     private Button btnNewGame;
     private Button btnExitGame;
+    private Button btnMenu;
 
     public MenuGUI(MenuScreen menuScreen) {
         super(menuScreen.getBatch());
@@ -30,10 +31,13 @@ public class MenuGUI extends SimpleGUI {
 
         btnNewGame = new TextButton("Start New Game", skin, "simpleSkin");
         btnExitGame = new TextButton("Exit Game", skin, "simpleSkin");
+        btnMenu = new TextButton("Return To Menu", skin, "simpleSkin");
         btnNewGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 170);
         btnExitGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 60);
+        btnMenu.setPosition(VIEWPORT_WIDTH / 2 - 160, SECOND_SCREEN_Y0 + 20);
         stage.addActor(btnNewGame);
         stage.addActor(btnExitGame);
+        stage.addActor(btnMenu);
     }
 
     @Override
@@ -41,14 +45,23 @@ public class MenuGUI extends SimpleGUI {
         btnNewGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ScreenManager.getInstance().setGameLevel(GameLevel.LEVEL1);
-                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
+                menuScreen.moveCameraDown();
+//                ScreenManager.getInstance().setGameLevel(GameLevel.LEVEL1);
+//                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
             }
         });
+
         btnExitGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.exit();
+            }
+        });
+
+        btnMenu.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                menuScreen.moveCameraUp();
             }
         });
 

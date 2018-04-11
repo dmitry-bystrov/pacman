@@ -53,8 +53,8 @@ public class LevelCompleteGUI extends SimpleGUI {
         btnNextLevel = new TextButton("Next Level", skin, "simpleSkin");
         btnMenu = new TextButton("Return To Menu", skin, "simpleSkin");
 
-        btnNextLevel.setPosition(VIEWPORT_WIDTH / 2 - 330, LevelComleteScreen.SECOND_SCREEN_Y0 + 30);
-        btnMenu.setPosition(VIEWPORT_WIDTH / 2 + 10, LevelComleteScreen.SECOND_SCREEN_Y0 + 30);
+        btnNextLevel.setPosition(VIEWPORT_WIDTH / 2 - 330, SECOND_SCREEN_Y0 + 30);
+        btnMenu.setPosition(VIEWPORT_WIDTH / 2 + 10, SECOND_SCREEN_Y0 + 30);
 
         stage.addActor(btnNextLevel);
         stage.addActor(btnMenu);
@@ -73,7 +73,7 @@ public class LevelCompleteGUI extends SimpleGUI {
         flowPanel.addActor(btnSaveResults);
 
         flowPanel.setVisible(false);
-        flowPanel.setPosition(VIEWPORT_WIDTH / 2 - 350, LevelComleteScreen.SECOND_SCREEN_Y0 + 405);
+        flowPanel.setPosition(VIEWPORT_WIDTH / 2 - 350, SECOND_SCREEN_Y0 + 405);
         stage.addActor(flowPanel);
     }
 

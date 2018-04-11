@@ -16,7 +16,6 @@ import com.mygdx.game.gui.LevelCompleteGUI;
 import java.util.*;
 
 public class LevelComleteScreen implements Screen, GameConstants {
-    public static final int SECOND_SCREEN_Y0 = 0 - VIEWPORT_HEIGHT;
     private static final float STATS_DELAY = 0.75f;
     private static final int MAX_STATS_COUNT = 9;
     private static final float SCORE_DELAY = 0.025f;
@@ -63,7 +62,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
     @Override
     public void show() {
         this.currentCameraPosition.set(firstCameraPosition);
-        moveCamera = true;
+        this.moveCamera = true;
         updateCamera();
 
         this.font32 = Assets.getInstance().getAssetManager().get("zorque32.ttf");
@@ -79,7 +78,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
         putTexture(GameObject.PIPE);
 
         loadTopScores();
-        levelCompleteGUI = new LevelCompleteGUI(this);
+        this.levelCompleteGUI = new LevelCompleteGUI(this);
 
         this.statsDelay = 0;
         this.scoreDelay = 0;

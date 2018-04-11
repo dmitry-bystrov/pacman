@@ -8,6 +8,7 @@ public interface GameConstants {
 
     int VIEWPORT_WIDTH = 1280;
     int VIEWPORT_HEIGHT = 720;
+    int SECOND_SCREEN_Y0 = 0 - VIEWPORT_HEIGHT;
 
     enum ScreenType { MENU, GAME, LEVEL_COMPLETE}
     enum Action { WAITING, MOVING, DIEING, RECOVERING }
