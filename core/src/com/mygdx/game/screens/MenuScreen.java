@@ -17,16 +17,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
+import com.mygdx.game.gui.MenuGUI;
 
 import java.util.HashMap;
 
 public class MenuScreen implements Screen, GameConstants {
     private SpriteBatch batch;
-    private Stage stage;
-    private Skin skin;
     private BitmapFont font32;
     private BitmapFont font48;
     private BitmapFont font96;
+    private MenuGUI menuGUI;
     private HashMap<GameObject, TextureRegion[]> textures;
 
     public MenuScreen(SpriteBatch batch) {
@@ -40,7 +40,12 @@ public class MenuScreen implements Screen, GameConstants {
         font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf", BitmapFont.class);
         font96 = Assets.getInstance().getAssetManager().get("zorque96.ttf", BitmapFont.class);
         putTexture(GameObject.EMPTY_CELL);
-        createGUI();
+
+        menuGUI = new MenuGUI(this);
+    }
+
+    public SpriteBatch getBatch() {
+        return batch;
     }
 
     private void putTexture(GameObject gameObject) {
@@ -69,43 +74,11 @@ public class MenuScreen implements Screen, GameConstants {
         font96.draw(batch, "Pac-Man 2018", 0, 600, VIEWPORT_WIDTH, 1, false);
         font48.draw(batch, "Arcade", 0, 480, VIEWPORT_WIDTH, 1, false);
         batch.end();
-        stage.draw();
+        menuGUI.renderStage();
     }
 
     public void update(float dt) {
-        stage.act(dt);
-    }
-
-    public void createGUI() {
-        stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
-        Gdx.input.setInputProcessor(stage);
-        skin = new Skin();
-        skin.addRegions(Assets.getInstance().getAtlas());
-        skin.add("font32", font32);
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.getDrawable("simpleButton");
-        textButtonStyle.font = font32;
-        skin.add("simpleSkin", textButtonStyle);
-
-        Button btnNewGame = new TextButton("Start New Game", skin, "simpleSkin");
-        Button btnExitGame = new TextButton("Exit Game", skin, "simpleSkin");
-        btnNewGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 170);
-        btnExitGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 60);
-        stage.addActor(btnNewGame);
-        stage.addActor(btnExitGame);
-        btnNewGame.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ScreenManager.getInstance().setGameLevel(GameLevel.LEVEL1);
-                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
-            }
-        });
-        btnExitGame.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.exit();
-            }
-        });
+        menuGUI.update(dt);
     }
 
     @Override
