@@ -1,33 +1,23 @@
-package com.mygdx.game.screens;
+package com.mygdx.game.gui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.mygdx.game.Assets;
-import com.mygdx.game.GameConstants;
+import com.mygdx.game.screens.GameScreen;
+import com.mygdx.game.screens.ScreenManager;
 
 import java.util.HashMap;
 
-public class SimpleGUI implements GameConstants {
+public class GameScreenGUI extends SimpleGUI {
 
     private GameScreen gameScreen;
-
-    private BitmapFont font32;
-    private BitmapFont font48;
-    private StringBuilder stringBuilder;
-
-    private Stage stage;
-    private Skin skin;
-
-    private Group flowPanel = new Group();
+    private Group flowPanel;
     private Button btnPause;
     private Button btnMenu;
     private Button btnContinue;
@@ -37,48 +27,17 @@ public class SimpleGUI implements GameConstants {
     private Image image;
     private HashMap<GameObject, TextureRegion[]> textures;
 
-    public SimpleGUI(GameScreen gameScreen) {
+    public GameScreenGUI(GameScreen gameScreen) {
+        super(gameScreen.getBatch());
+
         this.gameScreen = gameScreen;
-        this.stringBuilder = new StringBuilder(100);
-        this.font32 = Assets.getInstance().getAssetManager().get("zorque32.ttf");
-        this.font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf");
         this.textures = new HashMap<>();
         this.putTexture(GameObject.HEART);
-
-        this.setupSkin();
-        this.setupStage();
-        this.setupListeners();
     }
 
-    private void putTexture(GameObject gameObject) {
-        float textureSize = 1;
-
-        if (gameObject == GameObject.HEART) {
-            textureSize = 0.75f;
-        }
-
-        textures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split((int)(WORLD_CELL_PX * textureSize), (int)(WORLD_CELL_PX * textureSize))[gameObject.getTextureRegionIndex()]);
-    }
-
-    private TextureRegion[] getTexture(GameObject gameObject) {
-        return textures.get(gameObject);
-    }
-
-    private void setupSkin() {
-        skin = new Skin();
-        skin.addRegions(Assets.getInstance().getAtlas());
-        skin.add("font32", font32);
-        skin.add("font48", font48);
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.getDrawable("simpleButton");
-        textButtonStyle.font = font32;
-        skin.add("simpleSkin", textButtonStyle);
-
-        TextButton.TextButtonStyle shortButtonStyle = new TextButton.TextButtonStyle();
-        shortButtonStyle.up = skin.getDrawable("shortButton");
-        shortButtonStyle.font = font48;
-        skin.add("shortButtonSkin", shortButtonStyle);
+    @Override
+    protected void setupSkin() {
+        super.setupSkin();
 
         Pixmap pixmap = new Pixmap(360, 380, Pixmap.Format.RGB888);
         pixmap.setColor(0.0f, 0.0f, 0.3f, 1.0f);
@@ -87,10 +46,11 @@ public class SimpleGUI implements GameConstants {
         skin.add("texturePanel", texturePanel);
     }
 
-    private void setupStage() {
-        stage = new Stage(ScreenManager.getInstance().getViewport(), gameScreen.getBatch());
-        Gdx.input.setInputProcessor(stage);
+    @Override
+    protected void setupStage() {
+        super.setupStage();
 
+        flowPanel = new Group();
         Label.LabelStyle ls = new Label.LabelStyle(font48, Color.WHITE);
         btnPause = new TextButton("II", skin, "shortButtonSkin");
         btnMenu = new TextButton("Return to Menu", skin, "simpleSkin");
@@ -115,33 +75,8 @@ public class SimpleGUI implements GameConstants {
         stage.addActor(flowPanel);
     }
 
-    public void showPausePanel() {
-        gameScreen.setGamePaused(true);
-        btnPause.setVisible(false);
-
-        flowPanel.clearChildren();
-        flowPanel.addActor(image);
-        flowPanel.addActor(pauseLabel);
-        flowPanel.addActor(btnContinue);
-        flowPanel.addActor(btnRestart);
-        flowPanel.addActor(btnMenu);
-        flowPanel.setVisible(true);
-    }
-
-    public void showGameOverPanel() {
-        gameScreen.setGamePaused(true);
-        btnPause.setVisible(false);
-        flowPanel.clearChildren();
-
-        flowPanel.addActor(image);
-        flowPanel.addActor(gameOverLabel);
-        flowPanel.addActor(btnRestart);
-        flowPanel.addActor(btnMenu);
-
-        flowPanel.setVisible(true);
-    }
-
-    private void setupListeners() {
+    @Override
+    protected void setupListeners() {
         btnPause.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -176,8 +111,44 @@ public class SimpleGUI implements GameConstants {
         });
     }
 
-    public void renderStage() {
-        stage.draw();
+    private void putTexture(GameObject gameObject) {
+        float textureSize = 1;
+
+        if (gameObject == GameObject.HEART) {
+            textureSize = 0.75f;
+        }
+
+        textures.put(gameObject, Assets.getInstance().getAtlas().findRegion(gameObject.getTextureName()).split((int)(WORLD_CELL_PX * textureSize), (int)(WORLD_CELL_PX * textureSize))[gameObject.getTextureRegionIndex()]);
+    }
+
+    private TextureRegion[] getTexture(GameObject gameObject) {
+        return textures.get(gameObject);
+    }
+
+    private void showPausePanel() {
+        gameScreen.setGamePaused(true);
+        btnPause.setVisible(false);
+
+        flowPanel.clearChildren();
+        flowPanel.addActor(image);
+        flowPanel.addActor(pauseLabel);
+        flowPanel.addActor(btnContinue);
+        flowPanel.addActor(btnRestart);
+        flowPanel.addActor(btnMenu);
+        flowPanel.setVisible(true);
+    }
+
+    public void showGameOverPanel() {
+        gameScreen.setGamePaused(true);
+        btnPause.setVisible(false);
+        flowPanel.clearChildren();
+
+        flowPanel.addActor(image);
+        flowPanel.addActor(gameOverLabel);
+        flowPanel.addActor(btnRestart);
+        flowPanel.addActor(btnMenu);
+
+        flowPanel.setVisible(true);
     }
 
     public void renderStats() {
@@ -188,10 +159,4 @@ public class SimpleGUI implements GameConstants {
             gameScreen.getBatch().draw(getTexture(GameObject.HEART)[(gameScreen.getGameManager().getPacMan().getLives() > i?1:0)], VIEWPORT_WIDTH - 80 * (i + 1), VIEWPORT_HEIGHT - 80, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, WORLD_CELL_PX * 0.75f, 1, 1, 0);
         }
     }
-
-
-    public void update(float dt) {
-        stage.act(dt);
-    }
-
 }

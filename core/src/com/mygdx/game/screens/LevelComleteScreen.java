@@ -20,25 +20,25 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
 import com.mygdx.game.HighScoreSystem;
+import com.mygdx.game.gui.LevelCompleteGUI;
 
 import java.util.*;
 
 public class LevelComleteScreen implements Screen, GameConstants {
+    public static final int SECOND_SCREEN_Y0 = 0 - VIEWPORT_HEIGHT;
     private static final float STATS_DELAY = 0.75f;
     private static final int MAX_STATS_COUNT = 9;
     private static final float SCORE_DELAY = 0.025f;
-    private static final int SECOND_SCREEN_Y0 = 0 - VIEWPORT_HEIGHT;
     private static final int CAMERA_SPEED = 300;
 
     private SpriteBatch batch;
-    private Stage stage;
     private Camera camera;
-    private Skin skin;
+
     private BitmapFont font32;
     private BitmapFont font48;
     private BitmapFont font96;
 
-    private StringBuilder guiHelper;
+    private StringBuilder stringBuilder;
     private HashMap<GameObject, TextureRegion[]> textures;
     private LinkedHashMap<GameObject, Integer> gameStats;
 
@@ -49,6 +49,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
     private int starsCount;
     private int totalScore;
     private int totalScoreToDraw;
+    private LevelCompleteGUI levelCompleteGUI;
 
     private Vector2 firstCameraPosition;
     private Vector2 currentCameraPosition;
@@ -61,7 +62,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
         this.camera = camera;
         this.textures = new HashMap<>();
         this.gameStats = new LinkedHashMap<>();
-        this.guiHelper = new StringBuilder(100);
+        this.stringBuilder = new StringBuilder(100);
         this.firstCameraPosition = new Vector2(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
         this.currentCameraPosition = firstCameraPosition.cpy();
         this.secondCameraPosition = new Vector2(VIEWPORT_WIDTH / 2, SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT / 2);
@@ -74,9 +75,9 @@ public class LevelComleteScreen implements Screen, GameConstants {
         moveCamera = true;
         updateCamera();
 
-        font32 = Assets.getInstance().getAssetManager().get("zorque32.ttf", BitmapFont.class);
-        font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf", BitmapFont.class);
-        font96 = Assets.getInstance().getAssetManager().get("zorque96.ttf", BitmapFont.class);
+        this.font32 = Assets.getInstance().getAssetManager().get("zorque32.ttf");
+        this.font48 = Assets.getInstance().getAssetManager().get("zorque48.ttf");
+        this.font96 = Assets.getInstance().getAssetManager().get("zorque96.ttf");
 
         for (Map.Entry<GameObject, Integer> entry : gameStats.entrySet()) {
             putTexture(entry.getKey());
@@ -87,7 +88,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
         putTexture(GameObject.PIPE);
 
         loadTopScores();
-        createGUI();
+        levelCompleteGUI = new LevelCompleteGUI(this);
 
         this.statsDelay = 0;
         this.scoreDelay = 0;
@@ -96,6 +97,18 @@ public class LevelComleteScreen implements Screen, GameConstants {
         this.starsCount = 0;
         this.totalScore = 0;
         this.totalScoreToDraw = 0;
+    }
+
+    public SpriteBatch getBatch() {
+        return batch;
+    }
+
+    public int getStarsCount() {
+        return starsCount;
+    }
+
+    public int getTotalScore() {
+        return totalScore;
     }
 
     private void loadTopScores() {
@@ -173,7 +186,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
             updateCamera();
         }
 
-        stage.act(dt);
+        levelCompleteGUI.update(dt);
     }
 
     private void updateCamera() {
@@ -183,9 +196,9 @@ public class LevelComleteScreen implements Screen, GameConstants {
 
     private void drawStats() {
         font96.draw(batch, "Level Complete", 0, 670, VIEWPORT_WIDTH, 1, false);
-        guiHelper.setLength(0);
-        guiHelper.append("Total score: ").append(totalScoreToDraw);
-        font48.draw(batch, guiHelper, 420, 370, 0, -1, false);
+        stringBuilder.setLength(0);
+        stringBuilder.append("Total score: ").append(totalScoreToDraw);
+        font48.draw(batch, stringBuilder, 420, 370, 0, -1, false);
 
         for (int i = 0; i < 5; i++) {
             batch.draw(getTexture(GameObject.STAR)[(starsCount > i?1:0)], 200 + 180 * i, 420, WORLD_CELL_PX * 2, WORLD_CELL_PX * 2, WORLD_CELL_PX * 2, WORLD_CELL_PX * 2, 1, 1, 0);
@@ -202,18 +215,22 @@ public class LevelComleteScreen implements Screen, GameConstants {
 
             if (statsCounted < count) {
                 totalScore += entry.getKey().getScore() * entry.getValue();
+                if (totalScore > HighScoreSystem.getMinScore()) {
+                    levelCompleteGUI.showFlowInputPanel();
+                }
+
                 statsCounted++;
             }
 
             float imageX = 140 + xLine * 350;
-            float imageY = 250 - (yLine * WORLD_CELL_PX + 5);
+            float imageY = 250 - yLine * (WORLD_CELL_PX + 15);
             float textX = 140 + xLine * 350 + WORLD_CELL_PX + 5;
-            float textY = 250 - (yLine * WORLD_CELL_PX + 5) + WORLD_CELL_PX / 2;
+            float textY = 250 - yLine * (WORLD_CELL_PX + 15) + WORLD_CELL_PX / 2;
 
             batch.draw(getTexture(entry.getKey())[0], imageX, imageY, WORLD_CELL_PX / 2, WORLD_CELL_PX / 2, WORLD_CELL_PX, WORLD_CELL_PX, 1, 1, 0);
-            guiHelper.setLength(0);
-            guiHelper.append(": ").append(entry.getValue()).append("x").append(entry.getKey().getScore());
-            font48.draw(batch, guiHelper, textX, textY, 0, -1, false);
+            stringBuilder.setLength(0);
+            stringBuilder.append(": ").append(entry.getValue()).append("x").append(entry.getKey().getScore());
+            font48.draw(batch, stringBuilder, textX, textY, 0, -1, false);
 
             xLine++;
             if (xLine == 3) {
@@ -237,89 +254,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
         fillBackground();
         drawStats();
         batch.end();
-        stage.draw();
-    }
-
-    private void createGUI() {
-        stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
-        Gdx.input.setInputProcessor(stage);
-        skin = new Skin();
-
-        skin.addRegions(Assets.getInstance().getAtlas());
-        skin.add("nameField", new Texture("nameField.bmp"));
-        skin.add("cursor", new Texture("cursor.bmp"));
-        skin.add("font32", font32);
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.getDrawable("simpleButton");
-        textButtonStyle.font = font32;
-        skin.add("simpleSkin", textButtonStyle);
-
-        TextButton.TextButtonStyle shortTextButtonStyle = new TextButton.TextButtonStyle();
-        shortTextButtonStyle.up = skin.getDrawable("shortButton");
-        shortTextButtonStyle.font = font32;
-        skin.add("shortButtonStyle", shortTextButtonStyle);
-
-        TextField.TextFieldStyle tfs = new TextField.TextFieldStyle();
-        tfs.font = font32;
-        tfs.background = skin.getDrawable("nameField");
-        tfs.fontColor = Color.WHITE;
-        tfs.cursor = skin.getDrawable("cursor");
-        skin.add("textFieldStyle", tfs);
-
-        final TextField field = new TextField("Player", skin, "textFieldStyle");
-        field.setWidth(560);
-        field.setPosition(640 - 560 / 2, SECOND_SCREEN_Y0 + 150);
-
-        Button btnNextLevel = new TextButton("Next Level", skin, "simpleSkin");
-        Button btnMenu = new TextButton("Return To Menu", skin, "simpleSkin");
-        final Button btnSaveResults = new TextButton("OK", skin, "shortButtonStyle");
-        btnNextLevel.setPosition(VIEWPORT_WIDTH / 2 - 330, SECOND_SCREEN_Y0 + 30);
-        btnMenu.setPosition(VIEWPORT_WIDTH / 2 + 10, SECOND_SCREEN_Y0 + 30);
-        btnSaveResults.setPosition(640 + 560 / 2 + 40, SECOND_SCREEN_Y0 + 140);
-
-        stage.addActor(btnNextLevel);
-        stage.addActor(btnMenu);
-        stage.addActor(field);
-        stage.addActor(btnSaveResults);
-
-        int playerScores = 0;
-        for (Map.Entry<GameObject, Integer> entry : gameStats.entrySet()) {
-            playerScores += entry.getKey().getScore() * entry.getValue();
-        }
-
-        if (HighScoreSystem.getMinScore() >= playerScores) {
-            btnSaveResults.setVisible(false);
-            field.setVisible(false);
-        }
-
-        btnNextLevel.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                if (ScreenManager.getInstance().getGameLevel().getNext() != null) {
-                    ScreenManager.getInstance().setGameLevel(ScreenManager.getInstance().getGameLevel().getNext());
-                }
-
-                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
-            }
-        });
-
-        btnMenu.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ScreenManager.getInstance().changeScreen(ScreenType.MENU);
-            }
-        });
-
-        btnSaveResults.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                HighScoreSystem.saveResult(field.getText(), totalScore, starsCount, ScreenManager.getInstance().getGameLevel().getScoreFileName());
-
-                btnSaveResults.setVisible(false);
-                field.setVisible(false);
-            }
-        });
+        levelCompleteGUI.renderStage();
     }
 
     @Override

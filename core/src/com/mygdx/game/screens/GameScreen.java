@@ -10,6 +10,7 @@ import com.mygdx.game.GameConstants;
 import com.mygdx.game.GameManager;
 import com.mygdx.game.GameSession;
 import com.mygdx.game.creatures.Pacman;
+import com.mygdx.game.gui.GameScreenGUI;
 
 import java.util.LinkedHashMap;
 
@@ -17,7 +18,7 @@ public class GameScreen implements Screen, GameConstants {
     private SpriteBatch batch;
     private Camera camera;
     private GameManager gameManager;
-    private SimpleGUI simpleGUI;
+    private GameScreenGUI gameScreenGUI;
     private float cameraZoom;
     private boolean gamePaused;
 
@@ -30,7 +31,7 @@ public class GameScreen implements Screen, GameConstants {
     public void show() {
         this.gameManager = new GameManager(Difficulty.EXPERT);
         this.gameManager.setGameLevel(ScreenManager.getInstance().getGameLevel());
-        this.simpleGUI = new SimpleGUI(this);
+        this.gameScreenGUI = new GameScreenGUI(this);
 
         this.cameraZoom = 1;
         this.gamePaused = false;
@@ -71,9 +72,9 @@ public class GameScreen implements Screen, GameConstants {
 
         resetCamera();
         batch.setProjectionMatrix(camera.combined);
-        simpleGUI.renderStats();
+        gameScreenGUI.renderStats();
         batch.end();
-        simpleGUI.renderStage();
+        gameScreenGUI.renderStage();
     }
 
     private void resetCamera() {
@@ -117,10 +118,10 @@ public class GameScreen implements Screen, GameConstants {
         }
 
         if (gameManager.getPacMan().getLives() <= 0) {
-            simpleGUI.showGameOverPanel();
+            gameScreenGUI.showGameOverPanel();
         }
 
-        simpleGUI.update(dt);
+        gameScreenGUI.update(dt);
     }
 
     private void cameraTrackPackman(Pacman pacMan) {
