@@ -50,8 +50,8 @@ public class LevelCompleteGUI extends SimpleGUI {
     protected void setupStage() {
         super.setupStage();
 
-        btnNextLevel = new TextButton("Next Level", skin, "simpleSkin");
-        btnMenu = new TextButton("Return To Menu", skin, "simpleSkin");
+        btnNextLevel = new TextButton("Next Level", skin, SIMPLE_SKIN);
+        btnMenu = new TextButton("Return To Menu", skin, SIMPLE_SKIN);
 
         if (ScreenManager.getInstance().getGameLevel().getNext() != null) {
             btnNextLevel.setPosition(VIEWPORT_WIDTH / 2 - 330, SECOND_SCREEN_Y0 + 30);
@@ -66,7 +66,7 @@ public class LevelCompleteGUI extends SimpleGUI {
         flowPanel = new Group();
         image = new Image(skin, "texturePanel");
         field = new TextField("Player", skin, "textFieldStyle");
-        btnSaveResults = new TextButton("OK", skin, "shortButtonSkin");
+        btnSaveResults = new TextButton("OK", skin, SHORT_BUTTON_SKIN);
 
         field.setWidth(560);
         field.setPosition(20, 35);

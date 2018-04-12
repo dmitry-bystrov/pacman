@@ -22,6 +22,9 @@ public class ScreenManager implements GameConstants {
     private Viewport viewport;
     private Camera camera;
     private GameLevel gameLevel;
+    private Difficulty difficulty;
+    private boolean music;
+    private boolean sounds;
 
     private static ScreenManager ourInstance = new ScreenManager();
 
@@ -45,6 +48,22 @@ public class ScreenManager implements GameConstants {
         this.menuScreen = new MenuScreen(batch, camera);
         this.levelComleteScreen = new LevelComleteScreen(batch, camera);
         this.loadingScreen = new LoadingScreen(batch);
+
+        this.difficulty = Difficulty.NEWBIE;
+        this.music = true;
+        this.sounds = true;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public boolean isMusicOn() {
+        return music;
+    }
+
+    public boolean isSoundsOn() {
+        return sounds;
     }
 
     public GameLevel getGameLevel() {

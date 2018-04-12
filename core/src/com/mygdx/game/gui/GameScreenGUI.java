@@ -52,10 +52,10 @@ public class GameScreenGUI extends SimpleGUI {
 
         flowPanel = new Group();
         Label.LabelStyle ls = new Label.LabelStyle(font48, Color.WHITE);
-        btnPause = new TextButton("II", skin, "shortButtonSkin");
-        btnMenu = new TextButton("Return to Menu", skin, "simpleSkin");
-        btnContinue = new TextButton("Continue Game", skin, "simpleSkin");
-        btnRestart = new TextButton("Restart Level", skin, "simpleSkin");
+        btnPause = new TextButton("II", skin, SHORT_BUTTON_SKIN);
+        btnMenu = new TextButton("Return to Menu", skin, SIMPLE_SKIN);
+        btnContinue = new TextButton("Continue Game", skin, SIMPLE_SKIN);
+        btnRestart = new TextButton("Restart Level", skin, SIMPLE_SKIN);
         pauseLabel = new Label("Paused", ls);
         gameOverLabel = new Label("Game Over", ls);
         image = new Image(skin, "texturePanel");

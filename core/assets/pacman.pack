@@ -171,23 +171,30 @@ ground
   orig: 80, 80
   offset: 0, 0
   index: -1
-food
+gearButton
   rotate: false
   xy: 84, 814
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
-banana
+food
   rotate: false
   xy: 84, 896
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
-apple
+banana
   rotate: false
   xy: 166, 650
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+apple
+  rotate: false
+  xy: 248, 650
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
@@ -215,7 +222,7 @@ smallStars
   index: -1
 heart
   rotate: false
-  xy: 248, 650
+  xy: 330, 650
   size: 120, 60
   orig: 120, 60
   offset: 0, 0

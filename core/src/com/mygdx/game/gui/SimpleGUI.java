@@ -10,6 +10,11 @@ import com.mygdx.game.GameConstants;
 import com.mygdx.game.screens.ScreenManager;
 
 public class SimpleGUI implements GameConstants {
+    protected static final String GEAR_BUTTON_SKIN = "gearButtonSkin";
+    protected static final String SIMPLE_SKIN = "simpleSkin";
+    protected static final String SHORT_BUTTON_SKIN = "shortButtonSkin";
+    protected static final String MIDDLE_BUTTON_GREY_SKIN = "middleButtonGreySkin";
+    protected static final String MIDDLE_BUTTON_SKIN = "middleButtonSkin";
 
     protected BitmapFont font32;
     protected BitmapFont font48;
@@ -40,12 +45,12 @@ public class SimpleGUI implements GameConstants {
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.up = skin.getDrawable("simpleButton");
         textButtonStyle.font = font32;
-        skin.add("simpleSkin", textButtonStyle);
+        skin.add(SIMPLE_SKIN, textButtonStyle);
 
         TextButton.TextButtonStyle shortButtonStyle = new TextButton.TextButtonStyle();
         shortButtonStyle.up = skin.getDrawable("shortButton");
         shortButtonStyle.font = font48;
-        skin.add("shortButtonSkin", shortButtonStyle);
+        skin.add(SHORT_BUTTON_SKIN, shortButtonStyle);
     }
 
     protected void setupStage() {
