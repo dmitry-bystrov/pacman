@@ -42,11 +42,6 @@ public class SimpleGUI implements GameConstants {
         textButtonStyle.font = font32;
         skin.add("simpleSkin", textButtonStyle);
 
-        TextButton.TextButtonStyle textGreyButtonStyle = new TextButton.TextButtonStyle();
-        textGreyButtonStyle.up = skin.getDrawable("simpleButtonGrey");
-        textGreyButtonStyle.font = font32;
-        skin.add("simpleGreySkin", textGreyButtonStyle);
-
         TextButton.TextButtonStyle shortButtonStyle = new TextButton.TextButtonStyle();
         shortButtonStyle.up = skin.getDrawable("shortButton");
         shortButtonStyle.font = font48;

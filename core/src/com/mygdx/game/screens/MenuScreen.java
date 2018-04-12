@@ -125,18 +125,14 @@ public class MenuScreen implements Screen, GameConstants {
     }
 
     private void renderLevelPanes(SpriteBatch batch) {
-        int posX = 0;
-        int posY = 0;
-        final int paneWidth = 280;
-        final int paneHeight = 187;
-
-        int levelNumber = 0;
+        int posX;
+        int posY;
+        int levelNumber;
 
         for (int y = 0; y < 2; y++) {
             for (int x = 0; x < 4; x++) {
-                posX = 35 + x * (paneWidth + 30);
-                posY = SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT - (paneHeight + 30) - y * 300;
-                batch.draw(pane, posX, posY, paneWidth, paneHeight, paneWidth, paneHeight,1,1,0);
+                posX = 35 + x * 310;
+                posY = SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT - 190 - y * 290;
 
                 levelNumber = x + 1 + (4 * y);
 
