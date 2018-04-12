@@ -213,9 +213,16 @@ simpleButtonGrey
   orig: 280, 70
   offset: 0, 0
   index: -1
-heart
+smallStars
   rotate: false
   xy: 2, 944
+  size: 120, 60
+  orig: 120, 60
+  offset: 0, 0
+  index: -1
+heart
+  rotate: false
+  xy: 892, 273
   size: 120, 60
   orig: 120, 60
   offset: 0, 0

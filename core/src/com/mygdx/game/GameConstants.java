@@ -14,21 +14,23 @@ public interface GameConstants {
     enum Action { WAITING, MOVING, DIEING, RECOVERING }
 
     enum GameLevel {
-        LEVEL1("level1.map", "level1.dat"),
-        LEVEL2("level2.map", "level2.dat"),
-        LEVEL3("level3.map", "level3.dat"),
-        LEVEL4("level4.map", "level4.dat"),
-        LEVEL5("level5.map", "level5.dat"),
-        LEVEL6("level6.map", "level6.dat"),
-        LEVEL7("level7.map", "level7.dat"),
-        LEVEL8("level8.map", "level8.dat");
+        LEVEL1("level1.map", "level1.dat", "Level 1"),
+        LEVEL2("level2.map", "level2.dat", "Level 2"),
+        LEVEL3("level3.map", "level3.dat", "Level 3"),
+        LEVEL4("level4.map", "level4.dat", "Level 4"),
+        LEVEL5("level5.map", "level5.dat", "Level 5"),
+        LEVEL6("level6.map", "level6.dat", "Level 6"),
+        LEVEL7("level7.map", "level7.dat", "Level 7"),
+        LEVEL8("level8.map", "level8.dat", "Level 8");
 
         private final String mapFileName;
         private final String scoreFileName;
+        private final String levelName;
 
-        GameLevel(String mapFileName, String scoreFileName) {
+        GameLevel(String mapFileName, String scoreFileName, String levelName) {
             this.mapFileName = mapFileName;
             this.scoreFileName = scoreFileName;
+            this.levelName = levelName;
         }
 
         public String getMapFileName() {
@@ -37,6 +39,10 @@ public interface GameConstants {
 
         public String getScoreFileName() {
             return scoreFileName;
+        }
+
+        public String getLevelName() {
+            return levelName;
         }
 
         public GameLevel getNext() {

@@ -18,11 +18,22 @@ public class MenuGUI extends SimpleGUI {
     public MenuGUI(MenuScreen menuScreen) {
         super(menuScreen.getBatch());
         this.menuScreen = menuScreen;
+        setupLevelButtons();
     }
 
     @Override
     protected void setupSkin() {
         super.setupSkin();
+
+        TextButton.TextButtonStyle textButtonOrangeStyle = new TextButton.TextButtonStyle();
+        textButtonOrangeStyle.up = skin.getDrawable("simpleButtonOrange");
+        textButtonOrangeStyle.font = font32;
+        skin.add("simpleOrangeButtonSkin", textButtonOrangeStyle);
+
+        TextButton.TextButtonStyle textButtonGreyStyle = new TextButton.TextButtonStyle();
+        textButtonGreyStyle.up = skin.getDrawable("simpleButtonGrey");
+        textButtonGreyStyle.font = font32;
+        skin.add("simpleGreyButtonSkin", textButtonGreyStyle);
     }
 
     @Override
@@ -35,9 +46,36 @@ public class MenuGUI extends SimpleGUI {
         btnNewGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 170);
         btnExitGame.setPosition(VIEWPORT_WIDTH / 2 - 160, 60);
         btnMenu.setPosition(VIEWPORT_WIDTH / 2 - 160, SECOND_SCREEN_Y0 + 20);
+
         stage.addActor(btnNewGame);
         stage.addActor(btnExitGame);
         stage.addActor(btnMenu);
+    }
+
+    private void setupLevelButtons() {
+        int levelNumber;
+        boolean unlocked = true;
+
+        for (int y = 0; y < 2; y++) {
+            for (int x = 0; x < 4; x++) {
+                levelNumber = x + 1 + (4 * y);
+                if (levelNumber > 1) unlocked = menuScreen.getLevelStars()[levelNumber - 2] > 0;
+                Button button = new TextButton("Play", skin, unlocked?"simpleOrangeButtonSkin":"simpleGreyButtonSkin");
+                button.setPosition(35 + x * 310, SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT - 300 - y * 300);
+                stage.addActor(button);
+
+                if (unlocked) {
+                    final int lvl = levelNumber - 1;
+                    button.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor) {
+                            ScreenManager.getInstance().setGameLevel(GameLevel.values()[lvl]);
+                            ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
+                        }
+                    });
+                }
+            }
+        }
     }
 
     @Override
@@ -46,8 +84,6 @@ public class MenuGUI extends SimpleGUI {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 menuScreen.moveCameraDown();
-//                ScreenManager.getInstance().setGameLevel(GameLevel.LEVEL1);
-//                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
             }
         });
 

@@ -2,22 +2,15 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
+import com.mygdx.game.HighScoreSystem;
 import com.mygdx.game.gui.MenuGUI;
 
 import java.util.HashMap;
@@ -36,6 +29,7 @@ public class MenuScreen implements Screen, GameConstants {
     private TextureRegion[] stars;
     private TextureRegion lock;
     private TextureRegion pane;
+    private int[] levelStars;
 
     private Vector2 firstCameraPosition;
     private Vector2 currentCameraPosition;
@@ -48,15 +42,16 @@ public class MenuScreen implements Screen, GameConstants {
         this.camera = camera;
         this.textures = new HashMap<>();
 
+        this.levelStars = new int[GameLevel.values().length];
         this.firstCameraPosition = new Vector2();
         this.secondCameraPosition = new Vector2();
+        this.currentCameraPosition = new Vector2();
         this.cameraSpeed = new Vector2();
-
-        this.currentCameraPosition = new Vector2(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
     }
 
     @Override
     public void show() {
+        this.currentCameraPosition.set(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
         this.moveCamera = false;
         updateCamera();
 
@@ -67,6 +62,12 @@ public class MenuScreen implements Screen, GameConstants {
 
         pane = Assets.getInstance().getAtlas().findRegion("backTile");
         lock = Assets.getInstance().getAtlas().findRegion("lock");
+        stars = Assets.getInstance().getAtlas().findRegion("smallStars").split(60, 60)[0];
+
+        for (GameLevel lvl : GameLevel.values()) {
+            HighScoreSystem.loadResult(lvl.getScoreFileName());
+            levelStars[lvl.ordinal()] = HighScoreSystem.getMaxStars();
+        }
 
         this.menuGUI = new MenuGUI(this);
     }
@@ -83,6 +84,10 @@ public class MenuScreen implements Screen, GameConstants {
         secondCameraPosition.set(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
         this.cameraSpeed = new Vector2(0, CAMERA_SPEED);
         moveCamera = true;
+    }
+
+    public int[] getLevelStars() {
+        return levelStars;
     }
 
     public SpriteBatch getBatch() {
@@ -114,23 +119,33 @@ public class MenuScreen implements Screen, GameConstants {
         fillBackground();
         font96.draw(batch, "Pac-Man 2018", 0, 600, VIEWPORT_WIDTH, 1, false);
         font48.draw(batch, "Arcade", 0, 480, VIEWPORT_WIDTH, 1, false);
-        renderLevelSelectButtons(batch);
+        renderLevelPanes(batch);
         batch.end();
         menuGUI.renderStage();
     }
 
-    private void renderLevelSelectButtons(SpriteBatch batch) {
+    private void renderLevelPanes(SpriteBatch batch) {
         int posX = 0;
         int posY = 0;
         final int paneWidth = 280;
         final int paneHeight = 187;
 
+        int levelNumber = 0;
+
         for (int y = 0; y < 2; y++) {
             for (int x = 0; x < 4; x++) {
                 posX = 35 + x * (paneWidth + 30);
-                posY = SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT - (paneHeight + 30) - y * 260;
+                posY = SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT - (paneHeight + 30) - y * 300;
                 batch.draw(pane, posX, posY, paneWidth, paneHeight, paneWidth, paneHeight,1,1,0);
-                drawLockAtPosition(posX, posY);
+
+                levelNumber = x + 1 + (4 * y);
+
+                if (levelNumber == 1 || levelStars[levelNumber - 2] > 0) {
+                    drawLevelNameAtPosition(posX, posY, levelNumber);
+                    drawStarsAtPosition(posX, posY, levelStars[levelNumber - 1]);
+                } else {
+                    drawLockAtPosition(posX, posY);
+                }
             }
         }
     }
@@ -138,6 +153,18 @@ public class MenuScreen implements Screen, GameConstants {
     private void drawLockAtPosition(int x, int y) {
         final int lockSize = 128;
         batch.draw(lock, x + 74, y + 28, lockSize, lockSize, lockSize, lockSize,1,1,0);
+    }
+
+    private void drawLevelNameAtPosition(int x, int y, int number) {
+        font48.draw(batch, GameLevel.values()[number - 1].getLevelName(), x, y + 140, 280, 1, false);
+    }
+
+    private void drawStarsAtPosition(int x, int y, int starsCount) {
+        final int starSize = 60;
+
+        for (int i = 0; i < 5; i++) {
+            batch.draw(stars[(starsCount > i?1:0)], x + 35 * i + 40, y + 25, starSize, starSize, starSize, starSize, 1, 1, 0);
+        }
     }
 
     public void update(float dt) {
