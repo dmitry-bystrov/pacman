@@ -53,10 +53,14 @@ public class LevelCompleteGUI extends SimpleGUI {
         btnNextLevel = new TextButton("Next Level", skin, "simpleSkin");
         btnMenu = new TextButton("Return To Menu", skin, "simpleSkin");
 
-        btnNextLevel.setPosition(VIEWPORT_WIDTH / 2 - 330, SECOND_SCREEN_Y0 + 30);
-        btnMenu.setPosition(VIEWPORT_WIDTH / 2 + 10, SECOND_SCREEN_Y0 + 30);
+        if (ScreenManager.getInstance().getGameLevel().getNext() != null) {
+            btnNextLevel.setPosition(VIEWPORT_WIDTH / 2 - 330, SECOND_SCREEN_Y0 + 30);
+            btnMenu.setPosition(VIEWPORT_WIDTH / 2 + 10, SECOND_SCREEN_Y0 + 30);
+            stage.addActor(btnNextLevel);
+        } else {
+            btnMenu.setPosition(VIEWPORT_WIDTH / 2 - 160, SECOND_SCREEN_Y0 + 30);
+        }
 
-        stage.addActor(btnNextLevel);
         stage.addActor(btnMenu);
 
         flowPanel = new Group();
@@ -82,11 +86,8 @@ public class LevelCompleteGUI extends SimpleGUI {
         btnNextLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (ScreenManager.getInstance().getGameLevel().getNext() != null) {
-                    ScreenManager.getInstance().setGameLevel(ScreenManager.getInstance().getGameLevel().getNext());
-                }
-
-                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
+            ScreenManager.getInstance().setGameLevel(ScreenManager.getInstance().getGameLevel().getNext());
+            ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
             }
         });
 
