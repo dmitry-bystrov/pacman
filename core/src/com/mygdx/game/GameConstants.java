@@ -96,6 +96,11 @@ public interface GameConstants {
         public boolean isSmartAI() {
             return smartAI;
         }
+
+        public Difficulty getNext() {
+            if (this.ordinal() == Difficulty.values().length - 1) return Difficulty.values()[0];
+            return Difficulty.values()[this.ordinal() + 1];
+        }
     }
 
     enum Direction {

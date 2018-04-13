@@ -62,6 +62,14 @@ public class ScreenManager implements GameConstants {
         return music;
     }
 
+    public void setMusic(boolean music) {
+        this.music = music;
+    }
+
+    public void setSounds(boolean sounds) {
+        this.sounds = sounds;
+    }
+
     public boolean isSoundsOn() {
         return sounds;
     }

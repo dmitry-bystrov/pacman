@@ -26,9 +26,9 @@ public class MenuGUI extends SimpleGUI {
 
     private Image image;
     private Group flowPanel;
-    private Button btnDifficulty;
-    private Button btnMusic;
-    private Button btnSounds;
+    private TextButton btnDifficulty;
+    private TextButton btnMusic;
+    private TextButton btnSounds;
     private Button btnSaveSettings;
 
     public MenuGUI(MenuScreen menuScreen) {
@@ -41,7 +41,7 @@ public class MenuGUI extends SimpleGUI {
     protected void setupSkin() {
         super.setupSkin();
 
-        Pixmap pixmap = new Pixmap(400, 420, Pixmap.Format.RGB888);
+        Pixmap pixmap = new Pixmap(400, 500, Pixmap.Format.RGB888);
         pixmap.setColor(0.0f, 0.0f, 0.3f, 1.0f);
         pixmap.fill();
         Texture texturePanel = new Texture(pixmap);
@@ -87,14 +87,14 @@ public class MenuGUI extends SimpleGUI {
 
         image = new Image(skin, "texturePanel");
         btnDifficulty = new TextButton(ScreenManager.getInstance().getDifficulty().toString(), skin, MIDDLE_BUTTON_SKIN);
-        btnMusic = new TextButton(ScreenManager.getInstance().isMusicOn()? MUSIC_ON : MUSIC_OFF, skin, MIDDLE_BUTTON_SKIN);
-        btnSounds = new TextButton(ScreenManager.getInstance().isSoundsOn()? SOUNDS_ON : SOUNDS_OFF, skin, MIDDLE_BUTTON_SKIN);
-        btnSaveSettings = new TextButton("Save", skin, MIDDLE_BUTTON_SKIN);
+        btnMusic = new TextButton(ScreenManager.getInstance().isMusicOn()? MUSIC_ON : MUSIC_OFF, skin, ScreenManager.getInstance().isMusicOn()?MIDDLE_BUTTON_SKIN:MIDDLE_BUTTON_GREY_SKIN);
+        btnSounds = new TextButton(ScreenManager.getInstance().isSoundsOn()? SOUNDS_ON : SOUNDS_OFF, skin, ScreenManager.getInstance().isSoundsOn()?MIDDLE_BUTTON_SKIN:MIDDLE_BUTTON_GREY_SKIN);
+        btnSaveSettings = new TextButton("Return", skin, MIDDLE_BUTTON_SKIN);
 
-        btnDifficulty.setPosition(30, 300);
-        btnMusic.setPosition(30, 200);
-        btnSounds.setPosition(30, 100);
-        btnSaveSettings.setPosition(30, 30);
+        btnDifficulty.setPosition(60, 380);
+        btnMusic.setPosition(60, 280);
+        btnSounds.setPosition(60, 180);
+        btnSaveSettings.setPosition(60, 50);
 
         flowPanel.addActor(image);
         flowPanel.addActor(btnDifficulty);
@@ -133,6 +133,32 @@ public class MenuGUI extends SimpleGUI {
 
     @Override
     protected void setupListeners() {
+
+        btnDifficulty.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                btnDifficulty.setText(Difficulty.valueOf(btnDifficulty.getText().toString()).getNext().toString());
+            }
+        });
+
+        btnMusic.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ScreenManager.getInstance().setMusic(!ScreenManager.getInstance().isMusicOn());
+                btnMusic.setText(ScreenManager.getInstance().isMusicOn()? MUSIC_ON : MUSIC_OFF);
+                btnMusic.setStyle(skin.get(ScreenManager.getInstance().isMusicOn()?MIDDLE_BUTTON_SKIN:MIDDLE_BUTTON_GREY_SKIN, TextButton.TextButtonStyle.class));
+            }
+        });
+
+        btnSounds.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ScreenManager.getInstance().setSounds(!ScreenManager.getInstance().isSoundsOn());
+                btnSounds.setText(ScreenManager.getInstance().isSoundsOn()? MUSIC_ON : MUSIC_OFF);
+                btnSounds.setStyle(skin.get(ScreenManager.getInstance().isSoundsOn()?MIDDLE_BUTTON_SKIN:MIDDLE_BUTTON_GREY_SKIN, TextButton.TextButtonStyle.class));
+            }
+        });
+
         btnSettings.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
