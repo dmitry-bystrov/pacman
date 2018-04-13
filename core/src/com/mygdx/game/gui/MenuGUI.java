@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.mygdx.game.GameSettings;
 import com.mygdx.game.screens.MenuScreen;
 import com.mygdx.game.screens.ScreenManager;
 
@@ -18,6 +19,7 @@ public class MenuGUI extends SimpleGUI {
     public static final String MUSIC_ON = "Music On";
     public static final String SOUNDS_ON = "Sounds On";
     public static final String SOUNDS_OFF = "Sounds Off";
+    public static final String PLAY_BUTTON_TEXT = "Play";
     private MenuScreen menuScreen;
     private Button btnNewGame;
     private Button btnExitGame;
@@ -86,9 +88,9 @@ public class MenuGUI extends SimpleGUI {
         flowPanel.setPosition(VIEWPORT_WIDTH / 2 - 200, VIEWPORT_HEIGHT / 2 - 300);
 
         image = new Image(skin, "texturePanel");
-        btnDifficulty = new TextButton(ScreenManager.getInstance().getDifficulty().toString(), skin, MIDDLE_BUTTON_SKIN);
-        btnMusic = new TextButton(ScreenManager.getInstance().isMusicOn()? MUSIC_ON : MUSIC_OFF, skin, ScreenManager.getInstance().isMusicOn()?MIDDLE_BUTTON_SKIN:MIDDLE_BUTTON_GREY_SKIN);
-        btnSounds = new TextButton(ScreenManager.getInstance().isSoundsOn()? SOUNDS_ON : SOUNDS_OFF, skin, ScreenManager.getInstance().isSoundsOn()?MIDDLE_BUTTON_SKIN:MIDDLE_BUTTON_GREY_SKIN);
+        btnDifficulty = new TextButton(GameSettings.getDifficulty().toString(), skin, MIDDLE_BUTTON_SKIN);
+        btnMusic = new TextButton(GameSettings.isMusic()? MUSIC_ON : MUSIC_OFF, skin, GameSettings.isMusic()? MIDDLE_BUTTON_SKIN : MIDDLE_BUTTON_GREY_SKIN);
+        btnSounds = new TextButton(GameSettings.isSounds()? SOUNDS_ON : SOUNDS_OFF, skin, GameSettings.isSounds()? MIDDLE_BUTTON_SKIN : MIDDLE_BUTTON_GREY_SKIN);
         btnSaveSettings = new TextButton("Return", skin, MIDDLE_BUTTON_SKIN);
 
         btnDifficulty.setPosition(60, 380);
@@ -109,11 +111,19 @@ public class MenuGUI extends SimpleGUI {
         int levelNumber;
         boolean unlocked = true;
 
+        for (int i = 0; i < stage.getActors().size; i++) {
+            if (stage.getActors().get(i).getClass() == TextButton.class) {
+                if (((TextButton)stage.getActors().get(i)).getText().equals(PLAY_BUTTON_TEXT)) {
+                    stage.getActors().removeIndex(i);
+                }
+            }
+        }
+
         for (int y = 0; y < 2; y++) {
             for (int x = 0; x < 4; x++) {
                 levelNumber = x + 1 + (4 * y);
                 if (levelNumber > 1) unlocked = menuScreen.getLevelStars()[levelNumber - 2] > 0;
-                Button button = new TextButton("Play", skin, unlocked?"middleButtonSkin":"middleButtonGreySkin");
+                Button button = new TextButton(PLAY_BUTTON_TEXT, skin, unlocked?"middleButtonSkin":"middleButtonGreySkin");
                 button.setPosition(35 + x * 310, SECOND_SCREEN_Y0 + VIEWPORT_HEIGHT - 260 - y * 290);
                 stage.addActor(button);
 
@@ -137,25 +147,26 @@ public class MenuGUI extends SimpleGUI {
         btnDifficulty.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                btnDifficulty.setText(Difficulty.valueOf(btnDifficulty.getText().toString()).getNext().toString());
+                GameSettings.setDifficulty(GameSettings.getDifficulty().getNext());
+                btnDifficulty.setText(GameSettings.getDifficulty().toString());
             }
         });
 
         btnMusic.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ScreenManager.getInstance().setMusic(!ScreenManager.getInstance().isMusicOn());
-                btnMusic.setText(ScreenManager.getInstance().isMusicOn()? MUSIC_ON : MUSIC_OFF);
-                btnMusic.setStyle(skin.get(ScreenManager.getInstance().isMusicOn()?MIDDLE_BUTTON_SKIN:MIDDLE_BUTTON_GREY_SKIN, TextButton.TextButtonStyle.class));
+                GameSettings.setMusic(!GameSettings.isMusic());
+                btnMusic.setText(GameSettings.isMusic()? MUSIC_ON : MUSIC_OFF);
+                btnMusic.setStyle(skin.get(GameSettings.isMusic()? MIDDLE_BUTTON_SKIN : MIDDLE_BUTTON_GREY_SKIN, TextButton.TextButtonStyle.class));
             }
         });
 
         btnSounds.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ScreenManager.getInstance().setSounds(!ScreenManager.getInstance().isSoundsOn());
-                btnSounds.setText(ScreenManager.getInstance().isSoundsOn()? MUSIC_ON : MUSIC_OFF);
-                btnSounds.setStyle(skin.get(ScreenManager.getInstance().isSoundsOn()?MIDDLE_BUTTON_SKIN:MIDDLE_BUTTON_GREY_SKIN, TextButton.TextButtonStyle.class));
+                GameSettings.setSounds(!GameSettings.isSounds());
+                btnSounds.setText(GameSettings.isSounds()? SOUNDS_ON : SOUNDS_OFF);
+                btnSounds.setStyle(skin.get(GameSettings.isSounds()? MIDDLE_BUTTON_SKIN : MIDDLE_BUTTON_GREY_SKIN, TextButton.TextButtonStyle.class));
             }
         });
 
@@ -170,8 +181,11 @@ public class MenuGUI extends SimpleGUI {
         btnSaveSettings.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                GameSettings.saveSettings();
                 flowPanel.setVisible(false);
                 btnSettings.setVisible(true);
+                menuScreen.loadLevelStarts();
+                setupLevelButtons();
             }
         });
 

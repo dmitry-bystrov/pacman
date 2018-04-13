@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
+import com.mygdx.game.GameSettings;
 import com.mygdx.game.MyGdxGame;
 
 public class ScreenManager implements GameConstants {
@@ -22,9 +23,6 @@ public class ScreenManager implements GameConstants {
     private Viewport viewport;
     private Camera camera;
     private GameLevel gameLevel;
-    private Difficulty difficulty;
-    private boolean music;
-    private boolean sounds;
 
     private static ScreenManager ourInstance = new ScreenManager();
 
@@ -32,46 +30,24 @@ public class ScreenManager implements GameConstants {
         return ourInstance;
     }
 
-    public Viewport getViewport() {
-        return viewport;
-    }
-
     private ScreenManager() {
+
     }
 
     public void init(MyGdxGame game, SpriteBatch batch) {
         this.game = game;
         this.batch = batch;
+        GameSettings.loadSettings();
         this.camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         this.viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, camera);
         this.gameScreen = new GameScreen(batch, camera);
         this.menuScreen = new MenuScreen(batch, camera);
         this.levelComleteScreen = new LevelComleteScreen(batch, camera);
         this.loadingScreen = new LoadingScreen(batch);
-
-        this.difficulty = Difficulty.NEWBIE;
-        this.music = true;
-        this.sounds = true;
     }
 
-    public Difficulty getDifficulty() {
-        return difficulty;
-    }
-
-    public boolean isMusicOn() {
-        return music;
-    }
-
-    public void setMusic(boolean music) {
-        this.music = music;
-    }
-
-    public void setSounds(boolean sounds) {
-        this.sounds = sounds;
-    }
-
-    public boolean isSoundsOn() {
-        return sounds;
+    public Viewport getViewport() {
+        return viewport;
     }
 
     public GameLevel getGameLevel() {

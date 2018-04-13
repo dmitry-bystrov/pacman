@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.GameConstants;
 import com.mygdx.game.GameManager;
 import com.mygdx.game.GameSession;
+import com.mygdx.game.GameSettings;
 import com.mygdx.game.creatures.Pacman;
 import com.mygdx.game.gui.GameScreenGUI;
 
@@ -29,7 +30,7 @@ public class GameScreen implements Screen, GameConstants {
 
     @Override
     public void show() {
-        this.gameManager = new GameManager(Difficulty.EXPERT);
+        this.gameManager = new GameManager(GameSettings.getDifficulty());
         this.gameManager.setGameLevel(ScreenManager.getInstance().getGameLevel());
         this.gameScreenGUI = new GameScreenGUI(this);
 

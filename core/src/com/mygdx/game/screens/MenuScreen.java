@@ -63,11 +63,7 @@ public class MenuScreen implements Screen, GameConstants {
         pane = Assets.getInstance().getAtlas().findRegion("backTile");
         lock = Assets.getInstance().getAtlas().findRegion("lock");
         stars = Assets.getInstance().getAtlas().findRegion("smallStars").split(60, 60)[0];
-
-        for (GameLevel lvl : GameLevel.values()) {
-            HighScoreSystem.loadResult(lvl.getScoreFileName());
-            levelStars[lvl.ordinal()] = HighScoreSystem.getMaxStars();
-        }
+        loadLevelStarts();
 
         this.menuGUI = new MenuGUI(this);
     }
@@ -84,6 +80,13 @@ public class MenuScreen implements Screen, GameConstants {
         secondCameraPosition.set(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
         this.cameraSpeed = new Vector2(0, CAMERA_SPEED);
         moveCamera = true;
+    }
+
+    public void loadLevelStarts() {
+        for (GameLevel lvl : GameLevel.values()) {
+            HighScoreSystem.loadResult(lvl.getScoreFileName());
+            levelStars[lvl.ordinal()] = HighScoreSystem.getMaxStars();
+        }
     }
 
     public int[] getLevelStars() {

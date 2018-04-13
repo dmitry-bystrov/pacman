@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.mygdx.game.screens.ScreenManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +27,13 @@ public class HighScoreSystem {
         stringBuilder = new StringBuilder(250);
     }
 
+    private static String getFullScoreFileName(String scoreFileName) {
+        stringBuilder.setLength(0);
+        stringBuilder.append(GameSettings.getDifficulty().toString()).append('_').append(scoreFileName);
+
+        return stringBuilder.toString().toLowerCase();
+    }
+
     public static void saveResult(String player, int score, int stars, String scoreFileName) {
 
         if (player.length() > MAX_PLAYER_NAME_LENGTH) {
@@ -49,7 +57,7 @@ public class HighScoreSystem {
 
         Writer writer = null;
         try {
-            writer = Gdx.files.local(scoreFileName).writer(false);
+            writer = Gdx.files.local(getFullScoreFileName(scoreFileName)).writer(false);
             for (int i = 0; i < topPlayers.size(); i++) {
                 writer.write(topPlayers.get(i).replace(' ', '^') + ONE_SPACE + topScores.get(i) + ONE_SPACE + topStars.get(i));
                 writer.write("\n");
@@ -70,10 +78,10 @@ public class HighScoreSystem {
         topScores.clear();
         topStars.clear();
 
-        if (Gdx.files.local(scoreFileName).exists()) {
+        if (Gdx.files.local(getFullScoreFileName(scoreFileName)).exists()) {
             BufferedReader br = null;
             try {
-                br = Gdx.files.local(scoreFileName).reader(8192);
+                br = Gdx.files.local(getFullScoreFileName(scoreFileName)).reader(8192);
 
                 String line;
                 while ((line = br.readLine()) != null) {

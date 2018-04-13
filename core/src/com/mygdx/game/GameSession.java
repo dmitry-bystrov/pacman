@@ -10,7 +10,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class GameSession implements Serializable {
-    private static final String GAME_SESSION_FILE = "game_session.dat";
+    private static final String GAME_SESSION_FILE = "session.dat";
     private Pacman pacMan;
     private GameManager gameManager;
     private Ghost[] ghosts;
