@@ -8,9 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.Assets;
-import com.mygdx.game.GameConstants;
-import com.mygdx.game.HighScoreSystem;
+import com.mygdx.game.*;
 import com.mygdx.game.gui.LevelCompleteGUI;
 
 import java.util.*;
@@ -18,8 +16,8 @@ import java.util.*;
 public class LevelComleteScreen implements Screen, GameConstants {
     private static final float STATS_DELAY = 0.75f;
     private static final int MAX_STATS_COUNT = 9;
-    private static final float SCORE_DELAY = 0.025f;
-    private static final int CAMERA_SPEED = 300;
+    private static final float SCORE_DELAY = 0.05f;
+    private static final int CAMERA_SPEED = 600;
 
     private SpriteBatch batch;
     private Camera camera;
@@ -61,6 +59,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
 
     @Override
     public void show() {
+        MusicManager.playMusic();
         this.currentCameraPosition.set(firstCameraPosition);
         this.moveCamera = true;
         updateCamera();
@@ -151,9 +150,14 @@ public class LevelComleteScreen implements Screen, GameConstants {
                 if (totalScore - totalScoreToDraw > 500) increment = 100;
                 if (totalScore - totalScoreToDraw > 5000) increment = 1000;
                 totalScoreToDraw += increment;
+                SoundManager.playSound(GameSound.COIN);
 
+                int old_starsCount = starsCount;
                 starsCount = totalScoreToDraw / (gameStats.get(GameObject.FOOD) * GameObject.FOOD.getScore());
                 if (starsCount > 5) starsCount = 5;
+                if (old_starsCount < starsCount) {
+                    SoundManager.playSound(GameSound.STAR);
+                }
             }
         }
 

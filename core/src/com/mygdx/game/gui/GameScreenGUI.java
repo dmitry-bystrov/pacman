@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.mygdx.game.Assets;
+import com.mygdx.game.SoundManager;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.ScreenManager;
 
@@ -81,6 +82,7 @@ public class GameScreenGUI extends SimpleGUI {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 showPausePanel();
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
 
@@ -97,6 +99,7 @@ public class GameScreenGUI extends SimpleGUI {
                 gameScreen.setGamePaused(false);
                 flowPanel.setVisible(false);
                 btnPause.setVisible(true);
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
 
@@ -107,6 +110,7 @@ public class GameScreenGUI extends SimpleGUI {
                 gameScreen.setGamePaused(false);
                 flowPanel.setVisible(false);
                 btnPause.setVisible(true);
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
     }
@@ -128,7 +132,6 @@ public class GameScreenGUI extends SimpleGUI {
     private void showPausePanel() {
         gameScreen.setGamePaused(true);
         btnPause.setVisible(false);
-
         flowPanel.clearChildren();
         flowPanel.addActor(image);
         flowPanel.addActor(pauseLabel);
@@ -142,12 +145,10 @@ public class GameScreenGUI extends SimpleGUI {
         gameScreen.setGamePaused(true);
         btnPause.setVisible(false);
         flowPanel.clearChildren();
-
         flowPanel.addActor(image);
         flowPanel.addActor(gameOverLabel);
         flowPanel.addActor(btnRestart);
         flowPanel.addActor(btnMenu);
-
         flowPanel.setVisible(true);
     }
 

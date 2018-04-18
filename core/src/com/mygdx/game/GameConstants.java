@@ -13,6 +13,36 @@ public interface GameConstants {
     enum ScreenType { MENU, GAME, LEVEL_COMPLETE}
     enum Action { WAITING, MOVING, DIEING, RECOVERING }
 
+    enum GameSound {
+        CLICK("click.ogg", 1),
+        COIN("coin.wav", 0.4f),
+        STAR("star.wav", 0.75f),
+        FRUIT_APPEARANCE("fruit_appearance.wav", 0.5f),
+        FRUIT_COLLECTED("fruit_collected.wav", 0.5f),
+        GHOST("ghost.wav", 0.6f),
+        GHOST_KILLED("ghost_killed.wav", 0.5f),
+        PACMAN_KILLED("pacman_killed.wav", 0.5f),
+        POWERED("powered.wav", 0.6f),
+        TELEPORT("teleport.wav", 0.6f),
+        FOOD("food.wav", 0.5f);
+
+        private final String filename;
+        private final float volume;
+
+        GameSound(String filename, float volume) {
+            this.filename = filename;
+            this.volume = volume;
+        }
+
+        public String getFilename() {
+            return filename;
+        }
+
+        public float getVolume() {
+            return volume;
+        }
+    }
+
     enum GameLevel {
         LEVEL1("level1.map", "level1.dat", "Level 1"),
         LEVEL2("level2.map", "level2.dat", "Level 2"),

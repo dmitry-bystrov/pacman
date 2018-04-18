@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -22,7 +23,7 @@ public class GameManager implements GameConstants, Serializable {
     private transient HashMap<Integer, TextureRegion> pipesTextures;
     private HashMap<GameObject, Vector2> startPositions;
 
-    private int mapWidht;
+    private int mapWidth;
     private int mapHeight;
     private int foodCount;
     private final GameObject fruits[] = {GameObject.APPLE, GameObject.ORANGE, GameObject.BANANA};
@@ -33,11 +34,13 @@ public class GameManager implements GameConstants, Serializable {
     private Difficulty difficulty;
     private boolean ghostsEatable;
     private float eatableGhostsTimer;
-    private float packmanAttackTimer;
+    private float pacmanAttackTimer;
     private GameLevel gameLevel;
+    private Joystick joystick;
 
-    public GameManager(Difficulty difficulty) {
+    public GameManager(Difficulty difficulty, Joystick joystick) {
         this.difficulty = difficulty;
+        this.joystick = joystick;
         this.loadResources();
 
         this.pacMan = new Pacman(this, difficulty);
@@ -66,7 +69,8 @@ public class GameManager implements GameConstants, Serializable {
     public void startNewLevel() {
         ghostsEatable = false;
         eatableGhostsTimer = 0;
-        packmanAttackTimer = 0;
+        pacmanAttackTimer = 0;
+        joystick.reset();
 
         initMap(gameLevel.getMapFileName());
         pacMan.initStats();
@@ -88,6 +92,10 @@ public class GameManager implements GameConstants, Serializable {
             this.ghosts[i].loadResources(this);
             ghosts[i].setEatable(ghostsEatable);
         }
+    }
+
+    public Joystick getJoystick() {
+        return joystick;
     }
 
     public GameLevel getGameLevel() {
@@ -113,7 +121,7 @@ public class GameManager implements GameConstants, Serializable {
     }
 
     public boolean isOutOfBounds(int x, int y) {
-        return (x < 0 || x >= mapWidht || y < 0 || y >= mapHeight);
+        return (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight);
     }
 
     private TextureRegion getTexture(GameObject gameObject) {
@@ -128,8 +136,8 @@ public class GameManager implements GameConstants, Serializable {
         return foodCount;
     }
 
-    public int getMapWidht() {
-        return mapWidht;
+    public int getMapWidth() {
+        return mapWidth;
     }
 
     public int getMapHeight() {
@@ -142,8 +150,8 @@ public class GameManager implements GameConstants, Serializable {
 
     private void initMap(String mapFileName) {
         loadMap(mapFileName);
-        fruitsMap = new GameObject[mapWidht][mapHeight];
-        for (int i = 0; i < mapWidht; i++) {
+        fruitsMap = new GameObject[mapWidth][mapHeight];
+        for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
                 fruitsMap[i][j] = GameObject.EMPTY_CELL;
             }
@@ -163,10 +171,10 @@ public class GameManager implements GameConstants, Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mapWidht = list.get(0).length();
+        mapWidth = list.get(0).length();
         foodCount = 0;
         mapHeight = list.size();
-        mapData = new GameObject[mapWidht][mapHeight];
+        mapData = new GameObject[mapWidth][mapHeight];
         for (int y = 0; y < list.size(); y++) {
             for (int x = 0; x < list.get(y).length(); x++) {
                 mapData[x][y] = GameObject.getObject(list.get(y).charAt(x));
@@ -186,7 +194,7 @@ public class GameManager implements GameConstants, Serializable {
         int cellY;
         int pipeNumber;
 
-        for (int i = 0; i < mapWidht; i++) {
+        for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
                 batch.draw(getTexture(GameObject.EMPTY_CELL), i * WORLD_CELL_PX, j * WORLD_CELL_PX);
 
@@ -224,19 +232,20 @@ public class GameManager implements GameConstants, Serializable {
 
     public void addRandomFruit() {
         int cellsCount = 0;
-        for (int i = 0; i < mapWidht; i++) {
+        for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
                 if (fruitsMap[i][j] == GameObject.FOOD) cellsCount++;
             }
         }
 
         int targetCell = MathUtils.random(cellsCount);
-        for (int i = 0; i < mapWidht; i++) {
+        for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
                 if (fruitsMap[i][j] == GameObject.FOOD) {
                     if (targetCell == 0) {
                         mapData[i][j] = fruits[MathUtils.random(fruits.length - 1)];
                         fruitsMap[i][j] = GameObject.EMPTY_CELL;
+                        SoundManager.playSound(GameSound.FRUIT_APPEARANCE);
                         return;
                     }
 
@@ -275,8 +284,8 @@ public class GameManager implements GameConstants, Serializable {
     }
 
     private void updateGhostsTargetCell(float dt) {
-        packmanAttackTimer += dt;
-        if (packmanAttackTimer >= difficulty.getPacmanAttackTimer()) {
+        pacmanAttackTimer += dt;
+        if (pacmanAttackTimer >= difficulty.getPacmanAttackTimer()) {
             for (int i = 0; i < ghosts.length; i++) {
                 if (pacMan.getAction() != Action.RECOVERING) {
                     ghosts[i].setTargetCell(pacMan.getCurrentMapPosition());
@@ -284,7 +293,7 @@ public class GameManager implements GameConstants, Serializable {
                     ghosts[i].setTargetCell(getStartPosition(ghosts[i].getGameObject()));
                 }
             }
-            packmanAttackTimer = 0;
+            pacmanAttackTimer = 0;
         }
     }
 
@@ -293,6 +302,7 @@ public class GameManager implements GameConstants, Serializable {
             eatableGhostsTimer -= dt;
             if (eatableGhostsTimer <= 0) {
                 ghostsEatable = false;
+                SoundManager.playSound(GameSound.GHOST);
                 for (int i = 0; i < ghosts.length; i++) {
                     ghosts[i].setEatable(ghostsEatable);
                 }
@@ -320,6 +330,7 @@ public class GameManager implements GameConstants, Serializable {
                     ghosts[i].respawn();
                 } else {
                     pacMan.decreaseLives();
+                    SoundManager.playSound(GameSound.PACMAN_KILLED);
                     if (pacMan.getLives() > 0) pacMan.respawn();
                 }
             }

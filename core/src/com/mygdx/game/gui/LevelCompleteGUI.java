@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.mygdx.game.HighScoreSystem;
+import com.mygdx.game.SoundManager;
 import com.mygdx.game.screens.LevelComleteScreen;
 import com.mygdx.game.screens.ScreenManager;
 
@@ -103,6 +104,7 @@ public class LevelCompleteGUI extends SimpleGUI {
             public void changed(ChangeEvent event, Actor actor) {
                 HighScoreSystem.saveResult(field.getText(), levelComleteScreen.getTotalScore(), levelComleteScreen.getStarsCount(), ScreenManager.getInstance().getGameLevel().getScoreFileName());
                 flowPanel.setVisible(false);
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
     }

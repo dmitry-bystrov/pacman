@@ -1,6 +1,7 @@
 package com.mygdx.game.gui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -9,7 +10,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.mygdx.game.Assets;
 import com.mygdx.game.GameSettings;
+import com.mygdx.game.MusicManager;
+import com.mygdx.game.SoundManager;
 import com.mygdx.game.screens.MenuScreen;
 import com.mygdx.game.screens.ScreenManager;
 
@@ -36,6 +40,7 @@ public class MenuGUI extends SimpleGUI {
     public MenuGUI(MenuScreen menuScreen) {
         super(menuScreen.getBatch());
         this.menuScreen = menuScreen;
+
         setupLevelButtons();
     }
 
@@ -149,6 +154,7 @@ public class MenuGUI extends SimpleGUI {
             public void changed(ChangeEvent event, Actor actor) {
                 GameSettings.setDifficulty(GameSettings.getDifficulty().getNext());
                 btnDifficulty.setText(GameSettings.getDifficulty().toString());
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
 
@@ -158,6 +164,12 @@ public class MenuGUI extends SimpleGUI {
                 GameSettings.setMusic(!GameSettings.isMusic());
                 btnMusic.setText(GameSettings.isMusic()? MUSIC_ON : MUSIC_OFF);
                 btnMusic.setStyle(skin.get(GameSettings.isMusic()? MIDDLE_BUTTON_SKIN : MIDDLE_BUTTON_GREY_SKIN, TextButton.TextButtonStyle.class));
+                if (!GameSettings.isMusic()) {
+                    MusicManager.stopMusic();
+                } else {
+                    MusicManager.playMusic();
+                }
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
 
@@ -167,6 +179,7 @@ public class MenuGUI extends SimpleGUI {
                 GameSettings.setSounds(!GameSettings.isSounds());
                 btnSounds.setText(GameSettings.isSounds()? SOUNDS_ON : SOUNDS_OFF);
                 btnSounds.setStyle(skin.get(GameSettings.isSounds()? MIDDLE_BUTTON_SKIN : MIDDLE_BUTTON_GREY_SKIN, TextButton.TextButtonStyle.class));
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
 
@@ -175,6 +188,7 @@ public class MenuGUI extends SimpleGUI {
             public void changed(ChangeEvent event, Actor actor) {
                 flowPanel.setVisible(true);
                 btnSettings.setVisible(false);
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
 
@@ -186,6 +200,7 @@ public class MenuGUI extends SimpleGUI {
                 btnSettings.setVisible(true);
                 menuScreen.loadLevelStarts();
                 setupLevelButtons();
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
 
@@ -193,6 +208,7 @@ public class MenuGUI extends SimpleGUI {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 menuScreen.moveCameraDown();
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
 
@@ -207,8 +223,8 @@ public class MenuGUI extends SimpleGUI {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 menuScreen.moveCameraUp();
+                SoundManager.playSound(GameSound.CLICK);
             }
         });
-
     }
 }

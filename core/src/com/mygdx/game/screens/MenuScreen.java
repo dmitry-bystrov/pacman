@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
 import com.mygdx.game.HighScoreSystem;
+import com.mygdx.game.MusicManager;
 import com.mygdx.game.gui.MenuGUI;
 
 import java.util.HashMap;
@@ -51,6 +52,7 @@ public class MenuScreen implements Screen, GameConstants {
 
     @Override
     public void show() {
+        MusicManager.playMusic();
         this.currentCameraPosition.set(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
         this.moveCamera = false;
         updateCamera();

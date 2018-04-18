@@ -1,12 +1,14 @@
 package com.mygdx.game.gui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
+import com.mygdx.game.GameSettings;
 import com.mygdx.game.screens.ScreenManager;
 
 public class SimpleGUI implements GameConstants {
@@ -69,5 +71,4 @@ public class SimpleGUI implements GameConstants {
     public void update(float dt) {
         stage.act(dt);
     }
-
 }

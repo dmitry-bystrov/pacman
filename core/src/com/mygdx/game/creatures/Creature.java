@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.Assets;
 import com.mygdx.game.GameConstants;
 import com.mygdx.game.GameManager;
+import com.mygdx.game.SoundManager;
 
 import java.io.Serializable;
 
@@ -150,10 +151,11 @@ public abstract class Creature implements GameConstants, Serializable {
                 currentMapPosition.x = (int) currentWorldPosition.x / SIZE;
                 currentMapPosition.y = (int) currentWorldPosition.y / SIZE;
 
-                if (currentMapPosition.x == -1 || currentMapPosition.x == gameManager.getMapWidht()) {
-                    currentMapPosition.x = (gameManager.getMapWidht() - currentMapPosition.x) - 1;
+                if (currentMapPosition.x == -1 || currentMapPosition.x == gameManager.getMapWidth()) {
+                    currentMapPosition.x = (gameManager.getMapWidth() - currentMapPosition.x) - 1;
                     currentWorldPosition.x = currentMapPosition.x * SIZE;
                     destinationPoint.x = currentWorldPosition.x + SIZE * directionVector.x;
+                    SoundManager.playSound(GameSound.TELEPORT);
                 } else {
                     action = Action.WAITING;
                 }

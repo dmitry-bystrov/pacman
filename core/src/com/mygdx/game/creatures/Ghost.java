@@ -72,7 +72,7 @@ public class Ghost extends Creature {
     }
 
     public void initRouteMap() {
-        this.routeMap = new int[gameManager.getMapWidht()][gameManager.getMapHeight()];
+        this.routeMap = new int[gameManager.getMapWidth()][gameManager.getMapHeight()];
     }
 
     private void roundUpTarget(int targetX, int targetY) {

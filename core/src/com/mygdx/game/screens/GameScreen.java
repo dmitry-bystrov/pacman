@@ -6,10 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.GameConstants;
-import com.mygdx.game.GameManager;
-import com.mygdx.game.GameSession;
-import com.mygdx.game.GameSettings;
+import com.mygdx.game.*;
 import com.mygdx.game.creatures.Pacman;
 import com.mygdx.game.gui.GameScreenGUI;
 
@@ -18,6 +15,7 @@ import java.util.LinkedHashMap;
 public class GameScreen implements Screen, GameConstants {
     private SpriteBatch batch;
     private Camera camera;
+    private Joystick joystick;
     private GameManager gameManager;
     private GameScreenGUI gameScreenGUI;
     private float cameraZoom;
@@ -30,7 +28,9 @@ public class GameScreen implements Screen, GameConstants {
 
     @Override
     public void show() {
-        this.gameManager = new GameManager(GameSettings.getDifficulty());
+        MusicManager.playMusic();
+        this.joystick = new Joystick();
+        this.gameManager = new GameManager(GameSettings.getDifficulty(), joystick);
         this.gameManager.setGameLevel(ScreenManager.getInstance().getGameLevel());
         this.gameScreenGUI = new GameScreenGUI(this);
 
@@ -74,6 +74,7 @@ public class GameScreen implements Screen, GameConstants {
         resetCamera();
         batch.setProjectionMatrix(camera.combined);
         gameScreenGUI.renderStats();
+        joystick.render(batch);
         batch.end();
         gameScreenGUI.renderStage();
     }
@@ -112,6 +113,7 @@ public class GameScreen implements Screen, GameConstants {
 
         if (!gamePaused) {
             gameManager.update(dt);
+            joystick.update(dt);
 
             if (gameManager.getFoodCount() == 0) {
                 ScreenManager.getInstance().changeScreen(ScreenType.LEVEL_COMPLETE);
@@ -134,8 +136,8 @@ public class GameScreen implements Screen, GameConstants {
         if (camera.position.y < VIEWPORT_HEIGHT / 2) {
             camera.position.y = VIEWPORT_HEIGHT / 2;
         }
-        if (camera.position.x > gameManager.getMapWidht() * WORLD_CELL_PX - VIEWPORT_WIDTH / 2) {
-            camera.position.x = gameManager.getMapWidht() * WORLD_CELL_PX - VIEWPORT_WIDTH / 2;
+        if (camera.position.x > gameManager.getMapWidth() * WORLD_CELL_PX - VIEWPORT_WIDTH / 2) {
+            camera.position.x = gameManager.getMapWidth() * WORLD_CELL_PX - VIEWPORT_WIDTH / 2;
         }
         if (camera.position.y > gameManager.getMapHeight() * WORLD_CELL_PX - VIEWPORT_HEIGHT / 2) {
             camera.position.y = gameManager.getMapHeight() * WORLD_CELL_PX - VIEWPORT_HEIGHT / 2;
