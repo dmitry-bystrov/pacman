@@ -31,6 +31,7 @@ public class MenuScreen implements Screen, GameConstants {
     private TextureRegion lock;
     private TextureRegion pane;
     private int[] levelStars;
+    private boolean gamePaused;
 
     private Vector2 firstCameraPosition;
     private Vector2 currentCameraPosition;
@@ -55,6 +56,7 @@ public class MenuScreen implements Screen, GameConstants {
         MusicManager.playMusic();
         this.currentCameraPosition.set(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
         this.moveCamera = false;
+        this.gamePaused = false;
         updateCamera();
 
         this.font32 = Assets.getInstance().getAssetManager().get("zorque32.ttf", BitmapFont.class);
@@ -169,6 +171,8 @@ public class MenuScreen implements Screen, GameConstants {
     }
 
     public void update(float dt) {
+        if (gamePaused) return;
+
         if (moveCamera) {
             float distance = currentCameraPosition.dst(secondCameraPosition);
             currentCameraPosition.mulAdd(cameraSpeed, dt);
@@ -195,12 +199,12 @@ public class MenuScreen implements Screen, GameConstants {
 
     @Override
     public void pause() {
-
+        gamePaused = true;
     }
 
     @Override
     public void resume() {
-
+        gamePaused = false;
     }
 
     @Override

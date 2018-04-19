@@ -82,10 +82,10 @@ public interface GameConstants {
     }
 
     enum Difficulty {
-        NEWBIE(2.8f, 8, 6, 1.0f, 0.4f, true),
-        MIDDLE(2.4f, 6, 5, 1.2f, 0.6f, true),
-        EXPERT(2.0f, 4, 4, 1.4f, 0.8f, true),
-        NIGHTMARE(1.6f, 2, 3, 1.6f, 1.0f, true);
+        NEWBIE   (2.8f, 10, 6, 1.0f, 0.4f, true),
+        MIDDLE   (2.6f, 8,  5, 1.1f, 0.5f, true),
+        EXPERT   (2.2f, 6,  4, 1.2f, 0.6f, true),
+        NIGHTMARE(2.0f, 4,  3, 1.3f, 0.7f, true);
 
         private final float pacmanAttackTimer;
         private final int eatableGhostTimer;
@@ -171,20 +171,20 @@ public interface GameConstants {
     }
 
     enum GameObject {
-        PACMAN('s', true, false, 0, "pacman", 0),
-        FOOD('_', false, true, 5, "food", 0),
-        XFOOD('*', false, true, 20, "xfood", 0),
-        BANANA('n', false, true, 100, "banana", 0),
-        RED_GHOST('r', true, false, 50, "ghosts", 0),
-        GREEN_GHOST('g', true, false, 50, "ghosts", 1),
-        APPLE('a', false, true, 100, "apple", 0),
-        BLUE_GHOST('b', true, false, 50, "ghosts", 2),
-        PURPLE_GHOST('p', true, false, 50, "ghosts", 3),
-        ORANGE('o', false, true, 100, "orange", 0),
-        PIPE('1', false, false, 0, "pipe", 0),
-        STAR('2', false, false, 0, "stars", 0),
-        HEART('3', false, false, 0, "heart", 0),
-        EMPTY_CELL('0', false, false, 0, "ground", 0);
+        PACMAN      ('s', true,  false, 0, "pacman", 0),
+        FOOD        ('_', false, true,  5, "food", 0),
+        XFOOD       ('*', false, true,  20, "xfood", 0),
+        BANANA      ('n', false, true,  200, "banana", 0),
+        RED_GHOST   ('r', true,  false, 150, "ghosts", 0),
+        GREEN_GHOST ('g', true,  false, 150, "ghosts", 1),
+        APPLE       ('a', false, true,  200, "apple", 0),
+        BLUE_GHOST  ('b', true,  false, 150, "ghosts", 2),
+        PURPLE_GHOST('p', true,  false, 150, "ghosts", 3),
+        ORANGE      ('o', false, true,  200, "orange", 0),
+        PIPE        ('1', false, false, 0, "pipe", 0),
+        STAR        ('2', false, false, 0, "stars", 0),
+        HEART       ('3', false, false, 0, "heart", 0),
+        EMPTY_CELL  ('0', false, false, 0, "ground", 0);
 
         private final char mapSymbol;
         private final boolean isCreature;

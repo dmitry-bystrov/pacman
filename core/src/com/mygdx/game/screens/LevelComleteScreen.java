@@ -21,6 +21,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
 
     private SpriteBatch batch;
     private Camera camera;
+    private boolean gamePaused;
 
     private BitmapFont font32;
     private BitmapFont font48;
@@ -62,6 +63,7 @@ public class LevelComleteScreen implements Screen, GameConstants {
         MusicManager.playMusic();
         this.currentCameraPosition.set(firstCameraPosition);
         this.moveCamera = true;
+        this.gamePaused = false;
         updateCamera();
 
         this.font32 = Assets.getInstance().getAssetManager().get("zorque32.ttf");
@@ -140,6 +142,8 @@ public class LevelComleteScreen implements Screen, GameConstants {
     }
 
     public void update(float dt) {
+        if (gamePaused) return;
+
         if (totalScore > totalScoreToDraw) {
             scoreDelay += dt;
             if (scoreDelay >= SCORE_DELAY) {
@@ -258,12 +262,12 @@ public class LevelComleteScreen implements Screen, GameConstants {
 
     @Override
     public void pause() {
-
+        gamePaused = true;
     }
 
     @Override
     public void resume() {
-
+        gamePaused = false;
     }
 
     @Override
